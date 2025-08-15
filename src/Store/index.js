@@ -1,3 +1,3 @@
-import useCounterStore from './Store.js';
+import useBoardStore from './Store.js';
 
-export default useCounterStore;
+export default useBoardStore;

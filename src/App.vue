@@ -1,11 +1,5 @@
 <script setup>
     import CheckerBoard from './Components/CheckerBoard/CheckerBoard.vue';
-
-    /* 
-        this is where i left off, i need to learn how to use Pinia as the state management
-        for vue. and i also need to fix the issue regarding font files in this app.
-    */
-
 </script>
 
 <template>

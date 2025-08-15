@@ -16,7 +16,7 @@
 
     /* 
         this is where i left off, i need to finish implementing the rules logic
-        in the global store for the checkers app
+        in the global store for the checkers app (dont forget to fix the font file issues as well)
 
     */
 

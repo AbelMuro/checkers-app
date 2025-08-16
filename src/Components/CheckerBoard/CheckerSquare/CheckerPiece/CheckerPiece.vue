@@ -1,30 +1,38 @@
 <script setup>
     import useBoardStore from '~/Store';
+    import {computed} from 'vue';
+    import {storeToRefs} from 'pinia';
     import images from './images';
 
-    const {pieceId} = defineProps({
-        pieceId: String
+    const {column, row} = defineProps({
+        column: Number,
+        row: Number,
     });    
-    const store = useBoardStore()
-    const {setPiece} = store;
+    const store = useBoardStore();
+    const {board, current_turn} = storeToRefs(store);
+    const {setPiece, createLegalSquares} = store;
 
+    const pieceId = computed(() => {
+        return board.value[row][column];
+    });    
 
+    const pieceColor = computed(() => {
+        const temp = board.value[row][column];
+        return temp.slice(0, temp.indexOf(' '));
+    })
 
     const handlePiece = () => {
-        setPiece(pieceId)
+        if(pieceColor.value !== current_turn.value) return;
+
+        setPiece({pieceId: pieceId.value, row, column});
+        createLegalSquares(column, row);
     }
-
-    /* 
-        this is where i left off, i need to finish implementing the rules logic
-        in the global store for the checkers app (dont forget to fix the font file issues as well)
-
-    */
 
 </script>
 
 
 <template>
-    <img v-if="pieceId !== ''" class="piece" :src="images[pieceId.slice(0, pieceId.indexOf(' '))]" @click="handlePiece"/>
+    <img v-show="pieceId !== ''" class="piece" :src="images[pieceId.slice(0, pieceId.indexOf(' '))]" @click="handlePiece"/>
 </template>
 
 

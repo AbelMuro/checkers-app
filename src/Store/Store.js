@@ -3,7 +3,10 @@ import {diagonalOneMoves, checkForMultiCaptureJumps, capturePieces} from './Trav
 
 
 /* 
-    this is where i left off, i need to implement the logic for promoting pieces
+    this is where i left off, i need to continue implementing the multi take logic in the global store
+    Once a piece has been moved, we will check if that piece an double take by checking its diagonals
+    if a multi-take is possible, then the this.piece_can_multi_take property will be assigned 'true'
+
 */
 
 const useBoardStore = defineStore('board', {
@@ -63,7 +66,6 @@ const useBoardStore = defineStore('board', {
                 return;
             }
                 
-
             this.piece_to_be_moved = '';
             this.legal_moves =  [
                 ['', '', '', '', '', '' ,'', ''],

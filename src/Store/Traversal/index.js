@@ -1,3 +1,3 @@
-import {northWestSquare} from './Traversal.js';
+import {diagonalOneMoves, checkForMultiCaptureJumps, capturePieces} from './Traversal.js';
 
-export {northWestSquare}
+export {diagonalOneMoves, checkForMultiCaptureJumps, capturePieces}

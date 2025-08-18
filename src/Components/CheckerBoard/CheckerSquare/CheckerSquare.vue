@@ -13,7 +13,6 @@
         if(!legal_moves.value[row][column]) return;
 
         movePiece(column, row);
-        changeTurn();
     }
 
     onBeforeMount(() => {

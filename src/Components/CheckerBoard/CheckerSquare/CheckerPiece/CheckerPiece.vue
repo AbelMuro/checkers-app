@@ -1,6 +1,6 @@
 <script setup>
     import useBoardStore from '~/Store';
-    import {computed} from 'vue';
+    import {computed, watch} from 'vue';
     import {storeToRefs} from 'pinia';
     import images from './images';
 
@@ -21,6 +21,11 @@
         return temp.slice(0, temp.indexOf(' '));
     })
 
+    const isQueen = computed(() => {
+        const temp = board.value[row][column];
+        return temp?.includes('queen');
+    })
+
     const handlePiece = () => {
         if(pieceColor.value !== current_turn.value) return;
 
@@ -28,11 +33,15 @@
         createLegalSquares(column, row);
     }
 
+    watch([pieceColor, isQueen], () => {
+        console.log(pieceColor.value, isQueen.value)
+    })
+
 </script>
 
 
 <template>
-    <img v-show="pieceId !== ''" class="piece" :src="images[pieceId.slice(0, pieceId.indexOf(' '))]" @click="handlePiece"/>
+    <img v-show="pieceId !== ''" class="piece" :src="isQueen ? images[`queen${pieceColor}`] : images[pieceColor]" @click="handlePiece"/>
 </template>
 
 

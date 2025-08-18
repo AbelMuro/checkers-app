@@ -1,4 +1,5 @@
 import {defineStore} from 'pinia';
+import {diagonalOneMoves, checkForMultiCaptureJumps, capturePieces} from './Traversal';
 
 
 /* 
@@ -7,7 +8,7 @@ import {defineStore} from 'pinia';
 
 const useBoardStore = defineStore('board', {
     state: () => ({
-        board: [
+            board: [
                 ['black 9', '', 'black 10', '', 'black 11', '', 'black 12', ''],
                 ['', 'black 5', '', 'black 6', '', 'black 7', '', 'black 8'],
                 ['black 1', '', 'black 2', '', 'black 3', '', 'black 4', '',],
@@ -29,6 +30,7 @@ const useBoardStore = defineStore('board', {
             ],
             player: 'red',
             piece_to_be_moved: '',
+            piece_can_multi_take: false,
             current_turn: 'red'
 
         }),
@@ -38,55 +40,29 @@ const useBoardStore = defineStore('board', {
         },
         createLegalSquares(column, row) {
             if(!this.piece_to_be_moved) return;
-
-            if(this.current_turn === 'red'){
-                if(this.board[row - 1] && this.board[row - 1][column - 1] === '')    // north west move
-                    this.legal_moves[row - 1][column - 1] = true;
-
-                if(this.board[row - 1] && this.board[row - 1][column + 1] === '')    // north east move
-                    this.legal_moves[row - 1][column + 1] = true;
-
-                if((this.board[row - 1] && this.board[row - 1][column - 1]?.includes('black')) &&   //north west take
-                    (this.board[row - 2] && this.board[row - 2][column - 2] === ''))
-                        this.legal_moves[row - 2][column - 2] = 'take black north west';
-
-                if((this.board[row - 1] && this.board[row - 1][column + 1]?.includes('black')) &&   //north east take
-                    (this.board[row - 2] && this.board[row - 2][column + 2] === ''))
-                        this.legal_moves[row - 2][column + 2] = 'take black north east';
-            }
-            else if(this.current_turn === 'black'){
-               if(this.board[row + 1] && this.board[row + 1][column - 1] === '')     // south west move
-                    this.legal_moves[row + 1][column - 1] = true;
             
-                if(this.board[row + 1] && this.board[row + 1][column + 1] === '')    // south east move
-                    this.legal_moves[row + 1][column + 1] = true;
+            diagonalOneMoves(this.board, this.legal_moves, this.current_turn, column, row);
 
-                if((this.board[row + 1] && this.board[row + 1][column - 1]?.includes('red')) &&  //south west take
-                   (this.board[row + 2] && this.board[row + 2][column - 2] === ''))
-                     this.legal_moves[row + 2][column - 2] = 'take red south west';
-
-                if((this.board[row + 1] && this.board[row + 1][column + 1]?.includes('red')) &&             //south east take
-                   (this.board[row + 2] && this.board[row + 2][column + 2] === ''))   
-                     this.legal_moves[row + 2][column + 2] = 'take red south east';
-            }
         },
         movePiece(toColumn, toRow) {
             const pieceId = this.piece_to_be_moved.pieceId;
             const fromColumn = this.piece_to_be_moved.column;
             const fromRow = this.piece_to_be_moved.row;
+            const newSquare = this.legal_moves[toRow][toColumn];
 
-            if(this.legal_moves[toRow][toColumn] === 'take red south west')
-                this.board[toRow - 1][toColumn + 1] = '';
-            else if(this.legal_moves[toRow][toColumn] === 'take red south east')
-                this.board[toRow - 1][toColumn - 1] = '';
-            else if(this.legal_moves[toRow][toColumn] === 'take black north west')
-                this.board[toRow + 1][toColumn + 1] = '';
-            else if(this.legal_moves[toRow][toColumn] === 'take black north east')
-                this.board[toRow + 1][toColumn - 1] = '';
-
-
-            this.board[toRow][toColumn] = pieceId;
+            //we move the piece first
+            this.board[toRow][toColumn] = newSquare === 'promote' ? `${pieceId} queen` : pieceId;
             this.board[fromRow][fromColumn] = '';
+
+            //we check to see if there are any captured pieces
+            capturePieces(newSquare, this.board, toRow, toColumn)
+
+            //we check to see if the piece can multi-take
+            if(checkForMultiCaptureJumps(this.board, this.legal_moves, this.current_turn, toRow, toColumn)){
+                this.piece_can_multi_take = true;
+                return;
+            }
+                
 
             this.piece_to_be_moved = '';
             this.legal_moves =  [
@@ -99,6 +75,8 @@ const useBoardStore = defineStore('board', {
                 ['', '', '', '', '', '' ,'', ''],
                 ['', '', '', '', '', '' ,'', ''],
             ];
+            this.changeTurn();
+
         },
         changeTurn() {
             this.current_turn = this.current_turn === 'red' ? 'black' : 'red';

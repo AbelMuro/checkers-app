@@ -1,10 +1,10 @@
 <script setup>
-    import CheckerSquares from './CheckerSquare/CheckerSquare.vue';
+    import DisplaySquares from './DisplaySquares/DisplaySquares.vue';
 </script>
 
 <template>
     <section class="board">
-        <CheckerSquares/>
+        <DisplaySquares/>
     </section>
 </template>
 

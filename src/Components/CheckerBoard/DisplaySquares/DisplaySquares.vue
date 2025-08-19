@@ -1,19 +1,8 @@
 <script setup>
     import {ref, onBeforeMount} from 'vue';
-    import {storeToRefs} from 'pinia';
-    import CheckerPiece from './CheckerPiece/CheckerPiece.vue';
-    import useBoardStore from '~/Store';
+    import Square from './Square/Square.vue';
 
-    const store = useBoardStore();
-    const {legal_moves} = storeToRefs(store);
-    const {movePiece, changeTurn} = store;
     const squares = ref([]);
-
-    const handleSquare = (column, row) => {
-        if(!legal_moves.value[row][column]) return;
-
-        movePiece(column, row);
-    }
 
     onBeforeMount(() => {
         let alternate = true;
@@ -43,9 +32,8 @@
     <div 
         v-for="(square, i) in squares" 
         :key="`${square[0]} ${i}`" 
-        :class="square[0]"
-        @click="() => handleSquare(square[1], square[2])">
-            <CheckerPiece :column="square[1]" :row="square[2]"/>
+        :class="square[0]">
+            <Square :column="square[1]" :row="square[2]"/>
     </div>
 </template>
 

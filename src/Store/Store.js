@@ -1,11 +1,15 @@
 import {defineStore} from 'pinia';
-import {diagonalOneMoves, checkForMultiCaptureJumps, capturePieces} from './Traversal';
+import {diagonalMoves, diagonalTakes, checkForMultiCaptureJumps, createLegalSquaresForMultiCapture, capturePieces} from './Traversal';
 
 
 /* 
-    this is where i left off, i need to continue implementing the multi take logic in the global store
-    Once a piece has been moved, we will check if that piece an double take by checking its diagonals
-    if a multi-take is possible, then the this.piece_can_multi_take property will be assigned 'true'
+    this is where i left off, i need to refactor the multi-take logic in the global store, 
+    im using recursion to find all possible multi take jumps and using a number N to identify each multi-jump
+    in the legal_moves property of the global state
+
+    now i need to use N to traverse through the pieces_to_be_taken array and remove the pieces 
+    between 0 and N
+
 
 */
 
@@ -34,8 +38,8 @@ const useBoardStore = defineStore('board', {
             player: 'red',
             piece_to_be_moved: '',
             piece_can_multi_take: false,
-            current_turn: 'red'
-
+            current_turn: 'red',
+            pieces_to_be_taken: [],
         }),
     actions: {
         setPiece(piece) {
@@ -43,9 +47,10 @@ const useBoardStore = defineStore('board', {
         },
         createLegalSquares(column, row) {
             if(!this.piece_to_be_moved) return;
-            
-            diagonalOneMoves(this.board, this.legal_moves, this.current_turn, column, row);
-
+        
+            this.resetLegalMoves();
+            diagonalMoves(this.board, this.legal_moves, this.current_turn, column, row);
+            diagonalTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row);
         },
         movePiece(toColumn, toRow) {
             const pieceId = this.piece_to_be_moved.pieceId;
@@ -54,19 +59,21 @@ const useBoardStore = defineStore('board', {
             const newSquare = this.legal_moves[toRow][toColumn];
 
             //we move the piece first
-            this.board[toRow][toColumn] = newSquare === 'promote' ? `${pieceId} queen` : pieceId;
+            this.board[toRow][toColumn] = newSquare.includes('promote') ? `${pieceId} queen` : pieceId;
             this.board[fromRow][fromColumn] = '';
 
-            //we check to see if there are any captured pieces
+            //we check to see if the piece has taken any pieces, and we also check if the piece can multi-take
             capturePieces(newSquare, this.board, toRow, toColumn)
-
-            //we check to see if the piece can multi-take
-            if(checkForMultiCaptureJumps(this.board, this.legal_moves, this.current_turn, toRow, toColumn)){
-                this.piece_can_multi_take = true;
-                return;
-            }
                 
-            this.piece_to_be_moved = '';
+            this.resetPieceToBeMoved();
+            this.resetLegalMoves();
+            this.changeTurn();
+
+        },
+        changeTurn() {
+            this.current_turn = this.current_turn === 'red' ? 'black' : 'red';
+        },
+        resetLegalMoves() {
             this.legal_moves =  [
                 ['', '', '', '', '', '' ,'', ''],
                 ['', '', '', '', '', '' ,'', ''],
@@ -77,11 +84,9 @@ const useBoardStore = defineStore('board', {
                 ['', '', '', '', '', '' ,'', ''],
                 ['', '', '', '', '', '' ,'', ''],
             ];
-            this.changeTurn();
-
         },
-        changeTurn() {
-            this.current_turn = this.current_turn === 'red' ? 'black' : 'red';
+        resetPieceToBeMoved(){
+            this.piece_to_be_moved = '';
         }
     }
 })

@@ -9,8 +9,8 @@
         row: Number,
     });    
     const store = useBoardStore();
-    const {board, current_turn, piece_can_multi_take} = storeToRefs(store);
-    const {setPiece, createLegalSquares} = store;
+    const {board, current_turn, piece_can_multi_take, piece_to_be_moved} = storeToRefs(store);
+    const {setPiece, createLegalSquares, createLegalSquaresForMultiCaptureJumps} = store;
 
     const pieceId = computed(() => {
         return board.value[row][column];
@@ -28,10 +28,15 @@
 
     const handlePiece = () => {
         if(pieceColor.value !== current_turn.value) return;
-        if(piece_can_multi_take.value) return;
 
-        setPiece({pieceId: pieceId.value, row, column});
-        createLegalSquares(column, row);
+        if(piece_can_multi_take.value && piece_to_be_moved.value?.pieceId === pieceId.value)
+            createLegalSquaresForMultiCaptureJumps(column, row);
+        
+        else{
+            setPiece({pieceId: pieceId.value, row, column});
+            createLegalSquares(column, row);            
+        }
+
     }
 
     watch([pieceColor, isQueen], () => {

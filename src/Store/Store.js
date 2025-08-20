@@ -1,17 +1,6 @@
 import {defineStore} from 'pinia';
-import {diagonalMoves, diagonalTakes, capturePieces} from './Traversal';
+import {diagonalMoves, diagonalTakes, capturePieces, traverseBoard} from './Traversal';
 
-
-/* 
-    this is where i left off, i need to refactor the multi-take logic in the global store, 
-    im using recursion to find all possible multi take jumps and using a number N to identify each multi-jump
-    in the legal_moves property of the global state
-
-    now i need to use N to traverse through the pieces_to_be_taken array and remove the pieces 
-    between 0 and N
-
-
-*/
 
 const useBoardStore = defineStore('board', {
     state: () => ({
@@ -38,6 +27,7 @@ const useBoardStore = defineStore('board', {
             player: 'red',
             piece_to_be_moved: '',
             piece_can_multi_take: false,
+            piece_must_take: false,
             current_turn: 'red',
             pieces_to_be_taken: [],
         }),
@@ -49,6 +39,7 @@ const useBoardStore = defineStore('board', {
             if(!this.piece_to_be_moved) return;
         
             this.resetLegalMoves();
+            this.resetPiecesToBeTaken();
             diagonalTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row);
             if(!this.pieces_to_be_taken.length)
                 diagonalMoves(this.board, this.legal_moves, this.current_turn, column, row);
@@ -62,22 +53,37 @@ const useBoardStore = defineStore('board', {
 
             //we move the piece first
             this.board[toRow][toColumn] = newSquare.includes('promote') ? `${pieceId} queen` : pieceId;
+            this.legal_moves[toRow][toColumn] = '';
             this.board[fromRow][fromColumn] = '';
 
             //we check to see if the piece has taken any pieces, and we also check if the piece can multi-take
             capturePieces(newSquare, this.board, this.pieces_to_be_taken);
                 
             if(this.pieces_to_be_taken.length) {
-                this.piece_can_multi_take = true;
+                this.piece_can_multi_take = true;           //this will prevent any other pieces from being moved
+                this.piece_to_be_moved = {
+                    pieceId: this.board[toRow][toColumn],
+                    column: toColumn,
+                    row: toRow
+                }
                 return;
-            };
-            this.piece_can_multi_take = false;            
+            }
+            else
+                this.piece_can_multi_take = false;            
  
-
+            this.piece_to_be_moved = '';
             this.resetLegalMoves();
             this.resetPiecesToBeTaken();
             this.changeTurn();
 
+        },
+        checkForPossibleTakes() {
+            traverseBoard(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn)
+
+            if(this.pieces_to_be_taken.length)
+                this.piece_must_take = true;
+            else
+                this.piece_must_take = false;
         },
         changeTurn() {
             this.current_turn = this.current_turn === 'red' ? 'black' : 'red';

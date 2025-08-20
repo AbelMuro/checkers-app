@@ -1,3 +1,3 @@
-import {diagonalMoves, diagonalTakes, capturePieces} from './Traversal.js';
+import {diagonalMoves, diagonalTakes, capturePieces, traverseBoard} from './Traversal.js';
 
-export {diagonalMoves, diagonalTakes, capturePieces}
+export {diagonalMoves, diagonalTakes, capturePieces, traverseBoard}

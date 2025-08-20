@@ -1,5 +1,17 @@
 <script setup>
     import DisplaySquares from './DisplaySquares/DisplaySquares.vue';
+    import { watch } from 'vue';
+    import useBoardStore from '~/Store';
+    import { storeToRefs } from 'pinia';
+
+    const store = useBoardStore()
+    const {current_turn} = storeToRefs(store);
+    const {checkForPossibleTakes} = store;
+
+    watch(current_turn, () => {
+        checkForPossibleTakes();
+    })
+
 </script>
 
 <template>

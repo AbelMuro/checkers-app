@@ -19,7 +19,6 @@
 
     const handleSquare = () => {
         if(!legal_moves.value[row][column]) return;
-        if(piece_can_multi_take.value) return;
 
         movePiece(column, row);
     }

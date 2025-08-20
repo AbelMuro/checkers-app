@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia';
-import {diagonalMoves, diagonalTakes, checkForMultiCaptureJumps, createLegalSquaresForMultiCapture, capturePieces} from './Traversal';
+import {diagonalMoves, diagonalTakes, capturePieces} from './Traversal';
 
 
 /* 
@@ -49,8 +49,10 @@ const useBoardStore = defineStore('board', {
             if(!this.piece_to_be_moved) return;
         
             this.resetLegalMoves();
-            diagonalMoves(this.board, this.legal_moves, this.current_turn, column, row);
             diagonalTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row);
+            if(!this.pieces_to_be_taken.length)
+                diagonalMoves(this.board, this.legal_moves, this.current_turn, column, row);
+            
         },
         movePiece(toColumn, toRow) {
             const pieceId = this.piece_to_be_moved.pieceId;
@@ -63,10 +65,17 @@ const useBoardStore = defineStore('board', {
             this.board[fromRow][fromColumn] = '';
 
             //we check to see if the piece has taken any pieces, and we also check if the piece can multi-take
-            capturePieces(newSquare, this.board, toRow, toColumn)
+            capturePieces(newSquare, this.board, this.pieces_to_be_taken);
                 
-            this.resetPieceToBeMoved();
+            if(this.pieces_to_be_taken.length) {
+                this.piece_can_multi_take = true;
+                return;
+            };
+            this.piece_can_multi_take = false;            
+ 
+
             this.resetLegalMoves();
+            this.resetPiecesToBeTaken();
             this.changeTurn();
 
         },
@@ -87,6 +96,9 @@ const useBoardStore = defineStore('board', {
         },
         resetPieceToBeMoved(){
             this.piece_to_be_moved = '';
+        },
+        resetPiecesToBeTaken() {
+            this.pieces_to_be_taken = [];
         }
     }
 })

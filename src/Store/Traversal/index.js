@@ -1,3 +1,3 @@
-import {diagonalMoves, diagonalTakes, checkForMultiCaptureJumps, createLegalSquaresForMultiCapture, capturePieces} from './Traversal.js';
+import {diagonalMoves, diagonalTakes, capturePieces} from './Traversal.js';
 
-export {diagonalMoves, diagonalTakes, checkForMultiCaptureJumps, createLegalSquaresForMultiCapture, capturePieces}
+export {diagonalMoves, diagonalTakes, capturePieces}

@@ -27,7 +27,7 @@ const useBoardStore = defineStore('board', {
             player: 'red',
             piece_to_be_moved: '',
             piece_can_multi_take: false,
-            piece_must_take: false,
+            pieces_must_take: [],
             current_turn: 'red',
             pieces_to_be_taken: [],
         }),
@@ -40,6 +40,7 @@ const useBoardStore = defineStore('board', {
         
             this.resetLegalMoves();
             this.resetPiecesToBeTaken();
+
             diagonalTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row);
             if(!this.pieces_to_be_taken.length)
                 diagonalMoves(this.board, this.legal_moves, this.current_turn, column, row);
@@ -74,16 +75,24 @@ const useBoardStore = defineStore('board', {
             this.piece_to_be_moved = '';
             this.resetLegalMoves();
             this.resetPiecesToBeTaken();
+            this.resetPiecesMustTake();
             this.changeTurn();
 
         },
         checkForPossibleTakes() {
-            traverseBoard(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn)
+            traverseBoard(this);
+            if(!this.pieces_must_take.length) return;
 
-            if(this.pieces_to_be_taken.length)
-                this.piece_must_take = true;
-            else
-                this.piece_must_take = false;
+            const piece = this.pieces_must_take[0];
+            const column = piece.column;
+            const row = piece.row;
+            this.piece_to_be_moved = {
+                pieceId: piece.pieceId,
+                column,
+                row
+            }
+            diagonalTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row);
+
         },
         changeTurn() {
             this.current_turn = this.current_turn === 'red' ? 'black' : 'red';
@@ -105,6 +114,9 @@ const useBoardStore = defineStore('board', {
         },
         resetPiecesToBeTaken() {
             this.pieces_to_be_taken = [];
+        },
+        resetPiecesMustTake() {
+            this.pieces_must_take = [];
         }
     }
 })

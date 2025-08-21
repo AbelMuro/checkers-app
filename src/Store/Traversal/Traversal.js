@@ -17,7 +17,6 @@ export const diagonalMoves = (board, legal_moves, current_turn, column, row) => 
 
 export const diagonalTakes = (board, legal_moves, pieces_to_be_taken, current_turn, column, row, jumps = 1) => {
 
-
     if(current_turn === 'red'){
         if((board[row - 1] && board[row - 1][column - 1]?.includes('black')) &&         //north west take
             (board[row - 2] && board[row - 2][column - 2] === '')){
@@ -60,6 +59,7 @@ export const capturePieces = (newSquare, board, pieces_to_be_taken) => {
     for(let i = 0; i < Number(jumps); i++){             /* the problem, is that the pieces_to_be_taken array is not being emptied here*/
         piece = pieces_to_be_taken.shift();
         if(!piece) break;
+
         column = piece.column;
         row = piece.row;
         board[row][column] = '';
@@ -75,12 +75,39 @@ export const capturePieces = (newSquare, board, pieces_to_be_taken) => {
     Im just populating the legal_moves array at this point
 */
 
-export const traverseBoard = (board, legal_moves, pieces_to_be_taken, current_turn) => {
+export const traverseBoard = (state) => {
+    let currentPiece;
+
     for(let r = 0; r <= 7; r++){
         for(let c = 0; c <= 7; c++){
-            diagonalTakes(board, legal_moves, pieces_to_be_taken, current_turn, c, r)
-            if(pieces_to_be_taken.length)
-                return;
+            currentPiece = state.board[r][c];
+            const pieceColor = currentPiece.includes('red') ? 'red' : 'black';
+            if(!currentPiece || pieceColor !== state.current_turn) continue;
+
+            if(checkDiagonalTakes(state.board, pieceColor, c, r))
+                state.pieces_must_take.push({pieceId: currentPiece, column: c, row: r});
         }
     }
+}
+
+export const checkDiagonalTakes = (board, piece_color, column, row) => {
+    if(piece_color === 'red'){
+        if((board[row - 1] && board[row - 1][column - 1]?.includes('black')) &&         //north west take
+            (board[row - 2] && board[row - 2][column - 2] === ''))
+                return true;       
+        if((board[row - 1] && board[row - 1][column + 1]?.includes('black')) &&         //north east take
+            (board[row - 2] && board[row - 2][column + 2] === ''))
+                return true;
+    }
+    else if(piece_color === 'black'){
+        if((board[row + 1] && board[row + 1][column - 1]?.includes('red')) &&           //south west take
+            (board[row + 2] && board[row + 2][column - 2] === ''))
+                return true;
+            
+        if((board[row + 1] && board[row + 1][column + 1]?.includes('red')) &&             //south east take
+            (board[row + 2] && board[row + 2][column + 2] === '')) 
+                return true;             
+    }
+    
+    return false;
 }

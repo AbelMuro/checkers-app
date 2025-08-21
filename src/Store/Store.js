@@ -4,6 +4,8 @@ import {diagonalMoves, diagonalTakes, capturePieces, traverseBoard} from './Trav
 
 /* 
     this is where i left off, i need to start implementing the logic for the queen moves
+
+    and i also want to finish the design for the checkers pieces (queen)
 */
 
 const useBoardStore = defineStore('board', {

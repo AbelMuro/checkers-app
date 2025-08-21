@@ -2,6 +2,10 @@ import {defineStore} from 'pinia';
 import {diagonalMoves, diagonalTakes, capturePieces, traverseBoard} from './Traversal';
 
 
+/* 
+    this is where i left off, i need to start implementing the logic for the queen moves
+*/
+
 const useBoardStore = defineStore('board', {
     state: () => ({
             board: [

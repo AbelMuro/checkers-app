@@ -66,15 +66,6 @@ export const capturePieces = (newSquare, board, pieces_to_be_taken) => {
     }
 }
 
-/* 
-    this is where i left off, i need to finish the logic for the following function
-
-    everytime the current_turn has changed, we will check the whole board to see if a piece is forced to 
-    take another piece. If thats the case, then we call the following function and prevent all other pieces from being moved
-
-    Im just populating the legal_moves array at this point
-*/
-
 export const traverseBoard = (state) => {
     let currentPiece;
 

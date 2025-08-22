@@ -10,7 +10,7 @@
     });    
     const store = useBoardStore();
     const {board, current_turn, piece_can_multi_take, pieces_must_take} = storeToRefs(store);
-    const {setPiece, createLegalSquares} = store;
+    const {setPiece, createLegalSquares, createLegalSquaresForQueen} = store;
 
     const pieceId = computed(() => {
         return board.value[row][column];
@@ -35,7 +35,7 @@
         } 
             
         setPiece({pieceId: pieceId.value, row, column});
-        createLegalSquares(column, row);            
+        isQueen.value ? createLegalSquaresForQueen(column, row) : createLegalSquares(column, row);            
     }
 
 </script>

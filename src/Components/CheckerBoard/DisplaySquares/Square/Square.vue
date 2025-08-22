@@ -2,7 +2,7 @@
     import {computed} from 'vue';
     import {storeToRefs} from 'pinia';
     import useBoardStore from '~/Store';
-    import Piece from './Piece/Piece.vue'
+    import Piece from './Piece'
 
     const {row, column} = defineProps({
         row: Number,

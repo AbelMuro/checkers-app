@@ -1,6 +1,6 @@
 <script setup>
     import {ref, onBeforeMount} from 'vue';
-    import Square from './Square/Square.vue';
+    import Square from './Square';
 
     const squares = ref([]);
 

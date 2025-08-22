@@ -1,11 +1,26 @@
 import {defineStore} from 'pinia';
-import {diagonalMoves, diagonalTakes, capturePieces, traverseBoard} from './Traversal';
+import {diagonalMoves, diagonalQueenMoves, diagonalTakes, capturePieces, traverseBoard, diagonalQueenTakes} from './Traversal';
 
 
 /* 
-    this is where i left off, i need to start implementing the logic for the queen moves
+    1) The player will click on one of the pieces on the checker board and will trigger a 
+       click event handler
 
-    and i also want to finish the design for the checkers pieces (queen)
+    2) The event handler will update the global store by storing the data that identifies the 
+       piece that was clicked on (color of the piece, ID of the piece, column and row of the piece)
+
+    3) At this point, we call two functions that will find the legal squares that 
+       the piece can move into. We populate the legal_moves array in the global store, and 
+       if the piece can take other pieces, we populate the 'pieces_to_be_taken'
+       array in the global store.
+
+    4) If the player clicks on one of the squares in the board that is a legal square, we 
+      update the board by moving the piece to that square. If another piece is taken in the process,
+      then we empty out the 'pieces_to_be_taken' array by removing those pieces from the board
+*/
+
+/* 
+    this is where i left off, i need to start implementing the logic for the queen moves
 */
 
 const useBoardStore = defineStore('board', {
@@ -52,6 +67,17 @@ const useBoardStore = defineStore('board', {
                 diagonalMoves(this.board, this.legal_moves, this.current_turn, column, row);
             
         },
+        createLegalSquaresForQueen(column, row) {
+            if(!this.piece_to_be_moved) return;
+
+            this.resetLegalMoves();
+            this.resetPiecesToBeTaken();
+
+            diagonalQueenTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row);
+            if(!this.pieces_to_be_taken.length)
+                diagonalQueenMoves(this.board, this.legal_moves, column, row);
+
+        },
         movePiece(toColumn, toRow) {
             const pieceId = this.piece_to_be_moved.pieceId;
             const fromColumn = this.piece_to_be_moved.column;
@@ -90,6 +116,7 @@ const useBoardStore = defineStore('board', {
             if(!this.pieces_must_take.length) return;
 
             const piece = this.pieces_must_take[0];
+            const pieceId = piece.pieceId;
             const column = piece.column;
             const row = piece.row;
             this.piece_to_be_moved = {
@@ -97,7 +124,9 @@ const useBoardStore = defineStore('board', {
                 column,
                 row
             }
-            diagonalTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row);
+            pieceId?.includes('queen') ? 
+                diagonalQueenTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row) : 
+                diagonalTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row);
 
         },
         changeTurn() {

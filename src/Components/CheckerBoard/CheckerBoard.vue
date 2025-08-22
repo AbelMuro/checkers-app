@@ -1,5 +1,5 @@
 <script setup>
-    import DisplaySquares from './DisplaySquares/DisplaySquares.vue';
+    import DisplaySquares from './DisplaySquares';
     import { watch } from 'vue';
     import useBoardStore from '~/Store';
     import { storeToRefs } from 'pinia';
@@ -23,6 +23,8 @@
 
 <style scoped>
     .board{
+        grid-row: 2;
+        grid-column: 1;
         width: 700px;
         height: 700px;
         border-radius: 10px;

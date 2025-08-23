@@ -19,8 +19,12 @@ import {diagonalMoves, diagonalQueenMoves, diagonalTakes, capturePieces, travers
       then we empty out the 'pieces_to_be_taken' array by removing those pieces from the board
 */
 
+
+
+
+
 /* 
-    this is where i left off, i need to start implementing the logic for the queen moves
+    this is where i left off, i need to continue implementing the logic for the redoMove() action creator
 */
 
 const useBoardStore = defineStore('board', {
@@ -46,11 +50,16 @@ const useBoardStore = defineStore('board', {
                 ['', '', '', '', '', '' ,'', ''],
             ],
             player: 'red',
+            resign: false,
             piece_to_be_moved: '',
             piece_can_multi_take: false,
             pieces_must_take: [],
             current_turn: 'red',
             pieces_to_be_taken: [],
+            history: {
+                past: [],
+                future: [] 
+            }
         }),
     actions: {
         setPiece(piece) {
@@ -102,7 +111,13 @@ const useBoardStore = defineStore('board', {
                 return;
             }
             else
-                this.piece_can_multi_take = false;            
+                this.piece_can_multi_take = false;    
+            
+            this.history.past.push({
+                from: {pieceId: '', column: fromColumn, row: fromRow},
+                to: {pieceId, column: toColumn, row: toRow},
+                pieceTaken: this.pieces_to_be_taken[0]
+            })
  
             this.piece_to_be_moved = '';
             this.resetLegalMoves();
@@ -110,6 +125,21 @@ const useBoardStore = defineStore('board', {
             this.resetPiecesMustTake();
             this.changeTurn();
 
+        },
+        redoMove(){
+            const move = this.history.past.pop();
+            if(!move) return;
+
+            this.history.future.push(move);
+
+            const from = move.from;
+            const to = move.to;
+            const pieceTaken = move.pieceTaken
+
+            this.board[from.row][from.column] = from.pieceId;
+            this.board[to.row][to.column] = ''
+            if(pieceTaken)
+                this.board[pieceTaken.row][pieceTaken.column] = pieceTaken.pieceId;
         },
         checkForPossibleTakes() {
             traverseBoard(this);
@@ -131,6 +161,9 @@ const useBoardStore = defineStore('board', {
         },
         changeTurn() {
             this.current_turn = this.current_turn === 'red' ? 'black' : 'red';
+        },
+        resignGame() {
+            this.resign = true;
         },
         resetLegalMoves() {
             this.legal_moves =  [

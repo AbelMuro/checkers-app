@@ -1,6 +1,8 @@
 <script setup>
     import useBoardStore from '~/Store';
     import { storeToRefs } from 'pinia';
+    import Resign from './Resign';
+    import Redo from './Redo';
 
     const store = useBoardStore();
     const {current_turn} = storeToRefs(store);
@@ -17,6 +19,11 @@
         <h1 class="title">
             {{current_turn}} to move
         </h1>
+
+        <div class="buttons">
+            <Redo/>
+            <Resign/>
+        </div>
     </section>
 </template>
 
@@ -40,5 +47,13 @@
         font-size: 2rem;
         font-weight: 800;
         text-transform: capitalize;
+    }
+
+    .buttons{
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 10px;
+        row-gap: 15px;
     }
 </style>

@@ -6,7 +6,7 @@
 
     const winner = ref('');
     const store = useBoardStore();
-    const {board} = storeToRefs(store);
+    const {board, resign} = storeToRefs(store);
 
     watch(board, () => {
         const blackPieces = board.value.filter((piece) => {
@@ -21,6 +21,12 @@
             winner.value = 'Red'
         else if(!redPieces.length)
             winner.value = 'Black';
+    })
+
+    watch(resign, () => {
+        if(!resign.value) return;
+
+        winner.value = 'You have resigned'
     })
 
 </script>

@@ -24,9 +24,8 @@ import {diagonalMoves, diagonalQueenMoves, diagonalTakes, capturePieces, travers
 
 
 /* 
-    this is where i left off, i need to continue implementing the logic for the redoMove() method
-
-    i finished with the undoMove() method
+    this is where i left off, i need to continue testing the undo and redo functionality
+    to make sure there are no bugs
 */
 
 const useBoardStore = defineStore('board', {
@@ -67,19 +66,24 @@ const useBoardStore = defineStore('board', {
         setPiece(piece) {
             this.piece_to_be_moved = piece;
         },
-        createLegalSquares(column, row) {
+        createLegalSquares() {
             if(!this.piece_to_be_moved) return;
+            
+            const column = this.piece_to_be_moved.column;
+            const row = this.piece_to_be_moved.row;
         
             this.resetLegalMoves();
             this.resetPiecesToBeTaken();
 
             diagonalTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row);
             if(!this.pieces_to_be_taken.length)
-                diagonalMoves(this.board, this.legal_moves, this.current_turn, column, row);
-            
+                diagonalMoves(this.board, this.legal_moves, this.current_turn, column, row);            
         },
-        createLegalSquaresForQueen(column, row) {
+        createLegalSquaresForQueen() {
             if(!this.piece_to_be_moved) return;
+
+            const column = this.piece_to_be_moved.column;
+            const row = this.piece_to_be_moved.row;
 
             this.resetLegalMoves();
             this.resetPiecesToBeTaken();
@@ -117,11 +121,11 @@ const useBoardStore = defineStore('board', {
             //we check to see if the piece can multi-take
             if(this.pieces_to_be_taken.length) {
                 this.piece_can_multi_take = true;           //this will prevent any other pieces from being moved
-                this.piece_to_be_moved = {
+                this.setPiece({
                     pieceId: this.board[toRow][toColumn],
                     column: toColumn,
                     row: toRow,
-                }
+                })
                 return;
             }
             else
@@ -133,7 +137,6 @@ const useBoardStore = defineStore('board', {
             this.resetPiecesToBeTaken();
             this.resetPiecesMustTake();
             this.changeTurn();
-
         },
         undoMove(){
             const move = this.history.past.pop();
@@ -144,45 +147,69 @@ const useBoardStore = defineStore('board', {
             const from = move.from;
             const to = move.to;
             const pieceId = to.pieceId;
-            const piecesTaken = move.piecesTaken;
+            let piecesTaken = move.piecesTaken;
 
             this.board[from.row][from.column] = pieceId;
             this.board[to.row][to.column] = '';
 
             if(piecesTaken.length){
-                this.pieces_to_be_taken = JSON.parse(JSON.stringify(piecesTaken));
+                piecesTaken = JSON.parse(JSON.stringify(piecesTaken));
                 const jump = to.pieceId[to.pieceId.length - 1];
-
                 for(let i = 0; i < Number(jump); i++){
                     if(!piecesTaken[i]) break;
                     this.board[piecesTaken[i].row][piecesTaken[i].column] = piecesTaken[i].pieceId;              
                 }
             }
-            
-            this.piece_to_be_moved = {
+
+            this.current_turn = pieceId.includes('red') ? 'red' : 'black';            
+            this.setPiece({
                 pieceId,
                 column: from.column,
                 row: from.row
-            }
-            this.createLegalSquares(from.column, from.row);
-            this.current_turn = pieceId.includes('red') ? 'red' : 'black';
+            })
+
+            this.createLegalSquares();
         },
         redoMove() {
+            const move = this.history.future.pop();
+            if(!move) return;
 
+            this.history.past.push(move);
+
+            const from = move.from;
+            const to = move.to;
+            const pieceId = to.pieceId;
+            let piecesTaken = move.piecesTaken;
+
+            this.board[from.row][from.column] = '';
+            this.board[to.row][to.column] = pieceId;
+
+            if(piecesTaken.length){
+                piecesTaken = JSON.parse(JSON.stringify(piecesTaken));
+                const jump = to.pieceId[to.pieceId.length - 1];
+
+                for(let i = 0; i < Number(jump); i++){
+                    if(!piecesTaken[i]) break;
+                    this.board[piecesTaken[i].row][piecesTaken[i].column] = '';              
+                }
+            }
+            this.resetLegalMoves();
+            this.current_turn = pieceId.includes('red') ? 'black' : 'red';
         },
         checkForPossibleTakes() {
             traverseBoard(this);
             if(!this.pieces_must_take.length) return;
 
+            this.resetLegalMoves();
             const piece = this.pieces_must_take[0];
             const pieceId = piece.pieceId;
             const column = piece.column;
             const row = piece.row;
-            this.piece_to_be_moved = {
+            this.setPiece({
                 pieceId: piece.pieceId,
                 column,
                 row
-            }
+            })
             pieceId?.includes('queen') ? 
                 diagonalQueenTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row) : 
                 diagonalTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row);
@@ -195,18 +222,20 @@ const useBoardStore = defineStore('board', {
             this.resign = true;
         },
         resetLegalMoves() {
-            for(let r = 0; r <= 7; r++){
-                for(let c = 0; c <= 7; c++){
+            for(let r = 0; r <= 7; r++)
+                for(let c = 0; c <= 7; c++)
                     this.legal_moves[r][c] = '';
-                }
-            }
-            
         },
         resetPieceToBeMoved(){
             this.piece_to_be_moved = '';
         },
         resetPiecesToBeTaken() {
             this.pieces_to_be_taken = [];
+        },
+        updatePiecesMustTake(piece) {
+            this.pieces_must_take = this.pieces_must_take.filter((currentPiece) => {
+                return currentPiece.pieceId !== piece;
+            })
         },
         resetPiecesMustTake() {
             this.pieces_must_take = [];

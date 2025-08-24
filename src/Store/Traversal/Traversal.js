@@ -26,7 +26,7 @@ export const diagonalQueenMoves = (board, legal_moves, column, row) => {
             legal_moves[row + 1][column - 1] = 'legal move';
     
         if(board[row + 1] && board[row + 1][column + 1] === '')    // south east move
-            legal_moves[row + 1][column + 1] =  'legal move';
+            legal_moves[row + 1][column + 1] = 'legal move';
 }
 
 export const diagonalTakes = (board, legal_moves, pieces_to_be_taken, current_turn, column, row, jumps = 1) => {
@@ -146,6 +146,7 @@ export const capturePieces = (newSquare, board, pieces_to_be_taken) => {
 
 export const traverseBoard = (state) => {
     let currentPiece;
+    state.resetPiecesMustTake();
 
     for(let r = 0; r <= 7; r++){
         for(let c = 0; c <= 7; c++){

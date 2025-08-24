@@ -35,7 +35,7 @@
         } 
             
         setPiece({pieceId: pieceId.value, row, column});
-        isQueen.value ? createLegalSquaresForQueen(column, row) : createLegalSquares(column, row);            
+        isQueen.value ? createLegalSquaresForQueen() : createLegalSquares();            
     }
 
 </script>

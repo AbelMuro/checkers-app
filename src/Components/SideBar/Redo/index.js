@@ -1,3 +1,3 @@
-import Redo from './Redo.vue';
+import Redo from './Redo.vue'
 
-export default Redo
+export default Redo;

@@ -2,7 +2,8 @@
     import useBoardStore from '~/Store';
     import { storeToRefs } from 'pinia';
     import Resign from './Resign';
-    import Redo from './Redo';
+    import Undo from './Undo';
+    import Redo from './Redo'
 
     const store = useBoardStore();
     const {current_turn} = storeToRefs(store);
@@ -21,6 +22,7 @@
         </h1>
 
         <div class="buttons">
+            <Undo/>
             <Redo/>
             <Resign/>
         </div>

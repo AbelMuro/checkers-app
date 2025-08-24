@@ -131,6 +131,7 @@ export const capturePieces = (newSquare, board, pieces_to_be_taken) => {
     let column;
     let row;
     let piece;
+    let allTakenPieces = [];
 
     for(let i = 0; i < Number(jumps); i++){             /* the problem, is that the pieces_to_be_taken array is not being emptied here*/
         piece = pieces_to_be_taken.shift();
@@ -139,6 +140,7 @@ export const capturePieces = (newSquare, board, pieces_to_be_taken) => {
         column = piece.column;
         row = piece.row;
         board[row][column] = '';
+        allTakenPieces.push(piece);
     }
 }
 

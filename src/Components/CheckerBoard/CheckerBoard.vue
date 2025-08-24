@@ -5,12 +5,12 @@
     import { storeToRefs } from 'pinia';
 
     const store = useBoardStore()
-    const {current_turn} = storeToRefs(store);
+    const {board} = storeToRefs(store);
     const {checkForPossibleTakes} = store;
 
-    watch(current_turn, () => {
+    watch(board, () => {
         checkForPossibleTakes();
-    })
+    }, {deep: 2})
 
 </script>
 

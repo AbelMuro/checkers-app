@@ -11,7 +11,7 @@
 </script>
 
 <template>
-    <button class="redo">
+    <button class="redo" @click="handleRedo">
         Redo
     </button>
 

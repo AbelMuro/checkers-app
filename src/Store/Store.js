@@ -24,7 +24,9 @@ import {diagonalMoves, diagonalQueenMoves, diagonalTakes, capturePieces, travers
 
 
 /* 
-    this is where i left off, i need to continue implementing the logic for the redoMove() action creator
+    this is where i left off, i need to continue implementing the logic for the redoMove() method
+
+    i finished with the undoMove() method
 */
 
 const useBoardStore = defineStore('board', {

@@ -131,22 +131,20 @@ export const capturePieces = (newSquare, board, pieces_to_be_taken) => {
     let column;
     let row;
     let piece;
-    let allTakenPieces = [];
 
-    for(let i = 0; i < Number(jumps); i++){             /* the problem, is that the pieces_to_be_taken array is not being emptied here*/
+    for(let i = 1; i <= Number(jumps); i++){         
         piece = pieces_to_be_taken.shift();
         if(!piece) break;
 
         column = piece.column;
         row = piece.row;
         board[row][column] = '';
-        allTakenPieces.push(piece);
     }
+
 }
 
 export const traverseBoard = (state) => {
     let currentPiece;
-    state.resetPiecesMustTake();
 
     for(let r = 0; r <= 7; r++){
         for(let c = 0; c <= 7; c++){

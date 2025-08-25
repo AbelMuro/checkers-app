@@ -1,16 +1,22 @@
 <script setup>
     import DisplaySquares from './DisplaySquares';
-    import { watch } from 'vue';
+    import { watch, computed } from 'vue';
     import useBoardStore from '~/Store';
     import { storeToRefs } from 'pinia';
 
     const store = useBoardStore()
-    const {board} = storeToRefs(store);
+    const {board, history, piece_can_multi_take} = storeToRefs(store);
     const {checkForPossibleTakes} = store;
 
-    watch(board, () => {
+    const time_traveling = computed(() => {
+        return history.value.time_traveling;
+    })
+
+    watch([board, piece_can_multi_take], ([_, piece_can_multi_take]) => {
+        if(piece_can_multi_take) return;
+
         checkForPossibleTakes();
-    }, {deep: 2})
+    }, {deep: true, flush: 'post'})
 
 </script>
 

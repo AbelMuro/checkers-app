@@ -10,7 +10,7 @@
     });
 
     const store = useBoardStore();
-    const {legal_moves, piece_can_multi_take} = storeToRefs(store);
+    const {legal_moves} = storeToRefs(store);
     const {movePiece} = store;
 
     const isLegalSquare = computed(() => {
@@ -18,7 +18,7 @@
     })
 
     const handleSquare = () => {
-        if(!legal_moves.value[row][column]) return;
+        if(!isLegalSquare.value) return;
 
         movePiece(column, row);
     }

@@ -24,8 +24,10 @@ import {diagonalMoves, diagonalQueenMoves, diagonalTakes, capturePieces, travers
 
 
 /* 
-    this is where i left off, i need to continue testing the undo and redo functionality
-    to make sure there are no bugs
+    this is where i left off, i fixed most of the bugs concerning the redo and undo functionality
+
+    but i still need to fix the issue with a piece being promoted and unpromoted at the right times
+    when undo and redo buttons are being used
 */
 
 const useBoardStore = defineStore('board', {
@@ -59,7 +61,8 @@ const useBoardStore = defineStore('board', {
             pieces_to_be_taken: [],
             history: {
                 past: [],
-                future: [] 
+                future: [],
+                time_traveling: '', 
             }
         }),
     actions: {
@@ -94,13 +97,16 @@ const useBoardStore = defineStore('board', {
 
         },
         movePiece(toColumn, toRow) {
-            const pieceId = this.piece_to_be_moved.pieceId;
             const fromColumn = this.piece_to_be_moved.column;
             const fromRow = this.piece_to_be_moved.row;
             const newSquare = this.legal_moves[toRow][toColumn];
+            let pieceId = this.piece_to_be_moved.pieceId;
+            pieceId = newSquare.includes('promote') ? `${pieceId} queen` : pieceId
 
-            //we move the piece 
-            this.board[toRow][toColumn] = newSquare.includes('promote') ? `${pieceId} queen` : pieceId;
+            this.history.time_traveling = '';
+
+            //we move the piece in the board
+            this.board[toRow][toColumn] = pieceId;
             this.legal_moves[toRow][toColumn] = '';
             this.board[fromRow][fromColumn] = '';
 
@@ -108,56 +114,60 @@ const useBoardStore = defineStore('board', {
             this.history.past.push({
                 from: {pieceId: '', column: fromColumn, row: fromRow},
                 to: {pieceId, column: toColumn, row: toRow},
+                legalMove: newSquare,
                 piecesTaken: JSON.parse(JSON.stringify(this.pieces_to_be_taken)),
-            })
+            });
 
             //we remove all future recorded moves
             while(this.history.future.length)
                 this.history.future.pop();
 
-            //we check to see if the piece has taken any other pieces
+            //we check to see if the piece has taken any other pieces 
+            // (the following function will remove pieces from the board)
             capturePieces(newSquare, this.board, this.pieces_to_be_taken);
                 
             //we check to see if the piece can multi-take
-            if(this.pieces_to_be_taken.length) {
-                this.piece_can_multi_take = true;           //this will prevent any other pieces from being moved
+            if(this.pieces_to_be_taken.length) {                //this is the issue
+                this.piece_can_multi_take = true;               //this will prevent any other pieces from being moved
                 this.setPiece({
                     pieceId: this.board[toRow][toColumn],
                     column: toColumn,
                     row: toRow,
                 })
-                return;
             }
-            else
+            else{
                 this.piece_can_multi_take = false;    
- 
-            //we reset certain properties of the state
-            this.resetPieceToBeMoved();
-            this.resetLegalMoves();
-            this.resetPiecesToBeTaken();
-            this.resetPiecesMustTake();
-            this.changeTurn();
+                this.resetPieceToBeMoved();
+                this.resetLegalMoves();
+                this.resetPiecesToBeTaken();
+                this.resetPiecesMustTake();
+                this.changeTurn();                
+            }
         },
         undoMove(){
             const move = this.history.past.pop();
             if(!move) return;
 
             this.history.future.push(move);
+            this.history.time_traveling = 'undo';
 
             const from = move.from;
             const to = move.to;
-            const pieceId = to.pieceId;
-            let piecesTaken = move.piecesTaken;
+            const legalMove = move.legalMove;
+            const pieceId = to.pieceId;        
+            let piecesTaken = move.piecesTaken;            
 
             this.board[from.row][from.column] = pieceId;
             this.board[to.row][to.column] = '';
 
+            //if the current piece has taken pieces, we put those pieces back in the board
             if(piecesTaken.length){
                 piecesTaken = JSON.parse(JSON.stringify(piecesTaken));
-                const jump = to.pieceId[to.pieceId.length - 1];
-                for(let i = 0; i < Number(jump); i++){
+                const jump = legalMove[legalMove.length - 1];
+                const n = piecesTaken.length - 1;
+                for(let i = n; i >= n - Number(jump); i--){
                     if(!piecesTaken[i]) break;
-                    this.board[piecesTaken[i].row][piecesTaken[i].column] = piecesTaken[i].pieceId;              
+                    this.board[piecesTaken[i].row][piecesTaken[i].column] = piecesTaken[i].pieceId;                        
                 }
             }
 
@@ -168,43 +178,55 @@ const useBoardStore = defineStore('board', {
                 row: from.row
             })
 
-            this.createLegalSquares();
+            pieceId.includes('queen') ? 
+                this.createLegalSquaresForQueen() :
+                this.createLegalSquares();
         },
         redoMove() {
             const move = this.history.future.pop();
             if(!move) return;
 
             this.history.past.push(move);
+            this.history.time_traveling = 'redo';
 
             const from = move.from;
             const to = move.to;
+            const legalMove = move.legalMove;            
             const pieceId = to.pieceId;
+            const jump = Number(legalMove[legalMove.length - 1]);
             let piecesTaken = move.piecesTaken;
 
             this.board[from.row][from.column] = '';
             this.board[to.row][to.column] = pieceId;
 
+            //if the piece has taken other pieces, we re-take the pieces from the board
             if(piecesTaken.length){
-                piecesTaken = JSON.parse(JSON.stringify(piecesTaken));
-                const jump = to.pieceId[to.pieceId.length - 1];
-
-                for(let i = 0; i < Number(jump); i++){
+                for(let i = 0; i < jump; i++){
                     if(!piecesTaken[i]) break;
                     this.board[piecesTaken[i].row][piecesTaken[i].column] = '';              
                 }
             }
-            this.resetLegalMoves();
-            this.current_turn = pieceId.includes('red') ? 'black' : 'red';
-        },
-        checkForPossibleTakes() {
-            traverseBoard(this);
-            if(!this.pieces_must_take.length) return;
 
             this.resetLegalMoves();
+            if(jump < piecesTaken.length)
+                this.current_turn = pieceId.includes('red') ? 'red' : 'black';
+            else
+                this.current_turn = pieceId.includes('red') ? 'black' : 'red';
+        },
+        checkForPossibleTakes() {
+            this.resetPiecesMustTake();
+            this.resetLegalMoves();          
+              
+            //this function will populate the 'pieces_must_take' array
+            traverseBoard(this);        
+            if(!this.pieces_must_take.length) return;
+
+            //we get the first element in the array and use it as the current piece that must be moved
             const piece = this.pieces_must_take[0];
             const pieceId = piece.pieceId;
             const column = piece.column;
             const row = piece.row;
+
             this.setPiece({
                 pieceId: piece.pieceId,
                 column,

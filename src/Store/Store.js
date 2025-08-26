@@ -26,8 +26,8 @@ import {diagonalMoves, diagonalQueenMoves, diagonalTakes, capturePieces, travers
 /* 
     this is where i left off, i fixed most of the bugs concerning the redo and undo functionality
 
-    but i still need to fix the issue with a piece being promoted and unpromoted at the right times
-    when undo and redo buttons are being used
+    what i need to do is create another property in the object being assigned to 'history.past' array.
+    this property will tell me if moving the piece will create a promotion
 */
 
 const useBoardStore = defineStore('board', {

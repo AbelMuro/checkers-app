@@ -5,7 +5,7 @@
 </script>
 
 <template>
-    <section class="container">
+    <section class="app">
         <h1 class="title"> 
             World Class Checkers
         </h1>
@@ -21,7 +21,7 @@
         src: url('../public/fonts/Ubuntu-Regular.ttf');
     }
 
-    .container{
+    .app{
         width: 100%;
         height: 100vh;
         display: grid;

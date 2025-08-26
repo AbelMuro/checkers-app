@@ -1,34 +1,41 @@
 import {defineStore} from 'pinia';
-import {diagonalMoves, diagonalQueenMoves, diagonalTakes, capturePieces, traverseBoard, diagonalQueenTakes} from './Traversal';
+import {diagonalMoves, diagonalQueenMoves, diagonalTakes, traverseBoard, diagonalQueenTakes} from './Functions/Traversal';
+import {capturePieces} from './Functions/Capture';
 
 
 /* 
-    1) The player will click on one of the pieces on the checker board and will trigger a 
-       click event handler
+    1) The player will click on one of the pieces on the checker board and this will trigger a 
+       click event handler.
 
-    2) The event handler will update the global store by storing the data that identifies the 
-       piece that was clicked on (color of the piece, ID of the piece, column and row of the piece)
+    2) The event handler will update the global store by calling setPiece() and createLegalSquares().
+       setPiece() will update the 'piece_to_be_moved' property with the id, column and row of the piece
+       createLegalSquares() will update the 'legal_moves' property with the squares that the piece can move into.
+       Once the 'legal_moves' property has been updated, there will be white circles in certain squares in the board.
+       These white circles will let the player know that the square is a legal square, and they can move the piece to that square
 
-    3) At this point, we call two functions that will find the legal squares that 
-       the piece can move into. We populate the legal_moves array in the global store, and 
-       if the piece can take other pieces, we populate the 'pieces_to_be_taken'
-       array in the global store.
+    3) At the same time, when we call createLegalSquares(), we also identify which pieces can be captured. We do this by calling 
+       diagonalTakes(), this function will update the 'pieces_to_be_taken' property with the data of those pieces.
+    
+    4) Once the player clicks on one of the white circles on the board, we call movePiece(). This function will update the 'board'
+       property by moving the piece to the specified square.
+       We also traverse through the 'pieces_to_be_taken' property, capturing all the pieces on the board (this is only true if 'pieces_to_be_taken' is NOT empty)
 
-    4) If the player clicks on one of the squares in the board that is a legal square, we 
-      update the board by moving the piece to that square. If another piece is taken in the process,
-      then we empty out the 'pieces_to_be_taken' array by removing those pieces from the board
-*/
+    5) At this point, we call changeTurn() to update the 'current_turn' property. This function will change the turn from 'red' to 'black' or vice versa.
+
+    6) Once all state updates are finished and the call stack is empty. A re-render will occur and the watcher will be called in the CheckerBoard.vue file
+
+    7) The watcher will call checkForPossibleTakes(). This function will traverse through the board and identify the pieces that can be captured by the opposing pieces.
+       The function will also update the 'pieces_must_take' property. Any piece stored in this property MUST capture the specified piece. At this point, another
+       set of white circles will appear on the board.
 
 
+    Note to self:
+
+        The watcher in CheckerBoard.vue will NOT be called if the user clicks on the 'redo' and 'undo' buttons.
+        If it was called, then it will cause unexpected bugs. So i had to implement a separate logic for these buttons.
+*/ 
 
 
-
-/* 
-    this is where i left off, i fixed most of the bugs concerning the redo and undo functionality
-
-    what i need to do is create another property in the object being assigned to 'history.past' array.
-    this property will tell me if moving the piece will create a promotion
-*/
 
 const useBoardStore = defineStore('board', {
     state: () => ({
@@ -59,6 +66,10 @@ const useBoardStore = defineStore('board', {
             pieces_must_take: [],
             current_turn: 'red',
             pieces_to_be_taken: [],
+            captured_pieces: {
+                red: 0,
+                black: 0
+            },
             history: {
                 past: [],
                 future: [],
@@ -74,13 +85,14 @@ const useBoardStore = defineStore('board', {
             
             const column = this.piece_to_be_moved.column;
             const row = this.piece_to_be_moved.row;
+            const currentPiece = this.board[row][column];
         
             this.resetLegalMoves();
             this.resetPiecesToBeTaken();
 
-            diagonalTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row);
+            diagonalTakes(currentPiece, this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row);
             if(!this.pieces_to_be_taken.length)
-                diagonalMoves(this.board, this.legal_moves, this.current_turn, column, row);            
+                diagonalMoves(currentPiece, this.board, this.legal_moves, this.current_turn, column, row);            
         },
         createLegalSquaresForQueen() {
             if(!this.piece_to_be_moved) return;
@@ -102,6 +114,7 @@ const useBoardStore = defineStore('board', {
             const newSquare = this.legal_moves[toRow][toColumn];
             let pieceId = this.piece_to_be_moved.pieceId;
             pieceId = newSquare.includes('promote') ? `${pieceId} queen` : pieceId
+            const opposingColor = pieceId.includes('red') ? 'black' : 'red';
 
             this.history.time_traveling = '';
 
@@ -110,21 +123,23 @@ const useBoardStore = defineStore('board', {
             this.legal_moves[toRow][toColumn] = '';
             this.board[fromRow][fromColumn] = '';
 
+            //we check to see if the piece has taken any other pieces 
+            // (the following function will remove pieces from the board)
+            const piecesTaken = capturePieces(newSquare, this.board, this.pieces_to_be_taken);
+
             //we record the piece that moved
             this.history.past.push({
                 from: {pieceId: '', column: fromColumn, row: fromRow},
                 to: {pieceId, column: toColumn, row: toRow},
-                legalMove: newSquare,
-                piecesTaken: JSON.parse(JSON.stringify(this.pieces_to_be_taken)),
+                piecesTaken,
+                promotion: newSquare.includes('promote'),
             });
+
+            this.captured_pieces[opposingColor] += piecesTaken.length;
 
             //we remove all future recorded moves
             while(this.history.future.length)
                 this.history.future.pop();
-
-            //we check to see if the piece has taken any other pieces 
-            // (the following function will remove pieces from the board)
-            capturePieces(newSquare, this.board, this.pieces_to_be_taken);
                 
             //we check to see if the piece can multi-take
             if(this.pieces_to_be_taken.length) {                //this is the issue
@@ -149,27 +164,26 @@ const useBoardStore = defineStore('board', {
             if(!move) return;
 
             this.history.future.push(move);
-            this.history.time_traveling = 'undo';
+            this.history.time_traveling = true;
 
             const from = move.from;
             const to = move.to;
-            const legalMove = move.legalMove;
-            const pieceId = to.pieceId;        
+            const promotion = move.promotion;            
+            const pieceId = promotion ? `${to.pieceId.split(' ')[0]} ${to.pieceId.split(' ')[1]}` : to.pieceId;      
+            let opposingColor;  
             let piecesTaken = move.piecesTaken;            
 
             this.board[from.row][from.column] = pieceId;
             this.board[to.row][to.column] = '';
 
             //if the current piece has taken pieces, we put those pieces back in the board
-            if(piecesTaken.length){
-                piecesTaken = JSON.parse(JSON.stringify(piecesTaken));
-                const jump = legalMove[legalMove.length - 1];
-                const n = piecesTaken.length - 1;
-                for(let i = n; i >= n - Number(jump); i--){
-                    if(!piecesTaken[i]) break;
-                    this.board[piecesTaken[i].row][piecesTaken[i].column] = piecesTaken[i].pieceId;                        
-                }
-            }
+            piecesTaken.forEach((piece) => {
+                this.board[piece.row][piece.column] = piece.pieceId; 
+                opposingColor = piece.pieceId.includes('red') ? 'red' : 'black';
+                this.captured_pieces[opposingColor]--; 
+            });                
+
+            this.resetPiecesMustTake();
 
             this.current_turn = pieceId.includes('red') ? 'red' : 'black';            
             this.setPiece({
@@ -187,34 +201,46 @@ const useBoardStore = defineStore('board', {
             if(!move) return;
 
             this.history.past.push(move);
-            this.history.time_traveling = 'redo';
+            this.history.time_traveling = true;
 
             const from = move.from;
             const to = move.to;
-            const legalMove = move.legalMove;            
-            const pieceId = to.pieceId;
-            const jump = Number(legalMove[legalMove.length - 1]);
+            const promotion = move.promotion                     
+            const pieceId = promotion ? `${to.pieceId} queen` : to.pieceId;
             let piecesTaken = move.piecesTaken;
+            let opposingColor;
 
             this.board[from.row][from.column] = '';
             this.board[to.row][to.column] = pieceId;
 
             //if the piece has taken other pieces, we re-take the pieces from the board
-            if(piecesTaken.length){
-                for(let i = 0; i < jump; i++){
-                    if(!piecesTaken[i]) break;
-                    this.board[piecesTaken[i].row][piecesTaken[i].column] = '';              
-                }
-            }
+            piecesTaken.forEach((piece) => {
+                this.board[piece.row][piece.column] = '';  
+                opposingColor = piece.pieceId.includes('red') ? 'red' : 'black';
+                this.captured_pieces[opposingColor]++;
+            })
 
+            this.resetPiecesMustTake();
+            this.resetPiecesToBeTaken();
             this.resetLegalMoves();
-            if(jump < piecesTaken.length)
+            this.setPiece({
+                pieceId,
+                column: to.column,
+                row: to.row
+            });
+
+            pieceId?.includes('queen') ? 
+                diagonalQueenTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, to.column, to.row) : 
+                diagonalTakes(pieceId, this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, to.column, to.row);
+
+            if(this.pieces_to_be_taken.length)
                 this.current_turn = pieceId.includes('red') ? 'red' : 'black';
             else
                 this.current_turn = pieceId.includes('red') ? 'black' : 'red';
         },
         checkForPossibleTakes() {
             this.resetPiecesMustTake();
+            this.resetPiecesToBeTaken();
             this.resetLegalMoves();          
               
             //this function will populate the 'pieces_must_take' array
@@ -234,7 +260,7 @@ const useBoardStore = defineStore('board', {
             })
             pieceId?.includes('queen') ? 
                 diagonalQueenTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row) : 
-                diagonalTakes(this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row);
+                diagonalTakes(pieceId, this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row);
 
         },
         changeTurn() {

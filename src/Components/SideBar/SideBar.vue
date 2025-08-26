@@ -1,25 +1,19 @@
 <script setup>
-    import useBoardStore from '~/Store';
-    import { storeToRefs } from 'pinia';
     import Resign from './Resign';
     import Undo from './Undo';
     import Redo from './Redo'
-
-    const store = useBoardStore();
-    const {current_turn} = storeToRefs(store);
-
-    /* 
-        this is where i left off, i need to finish implementing 
-        the logic for this component (redo, undo moves, resign, etc...)
-    */
-
+    import PieceMustCapture from './PieceMustCapture';
+    import DisplayCurrentTurn from './DisplayCurrentTurn';
+    import CapturedPieces from './CapturedPieces'
 </script>
 
 <template>
     <section class="container">
-        <h1 class="title">
-            {{current_turn}} to move
-        </h1>
+        <div className="header">
+            <DisplayCurrentTurn/>
+            <CapturedPieces/>
+            <PieceMustCapture/>
+        </div>
 
         <div class="buttons">
             <Undo/>
@@ -38,18 +32,18 @@
         padding: 25px;
         display: flex;
         flex-direction: column;
-        justify-content: start;
+        justify-content: space-between;
         align-items: center;
         border-radius: 15px;
         background-color: rgb(12, 12, 12);
     }
 
-    .title{
-        font-family: 'ubuntu';
-        font-size: 2rem;
-        font-weight: 800;
-        text-transform: capitalize;
-    }
+    .header{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        row-gap: 15px;
+    }  
 
     .buttons{
         width: 100%;

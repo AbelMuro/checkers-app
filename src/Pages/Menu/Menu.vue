@@ -7,6 +7,13 @@
         router.push('/checkerboard')
     }
 
+    /* 
+        this is where i left off, i want to continue learning more about vue-router
+        and then i can finish implementing the following component
+
+    */
+
+
 </script>
 
 <template>

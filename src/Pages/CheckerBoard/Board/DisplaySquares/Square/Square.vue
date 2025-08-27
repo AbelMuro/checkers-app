@@ -48,4 +48,18 @@
         border-radius: 100%;
         border: 1px solid white;
     }
+
+    @media(max-width: 750px){
+        .whiteCircle{
+            width: 35px;
+            height: 35px;
+        }
+    }
+
+    @media(max-width: 480px){
+        .whiteCircle{
+            width: 28px;
+            height: 28px;
+        }
+    }
 </style>

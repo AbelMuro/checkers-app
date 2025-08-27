@@ -1,24 +1,25 @@
 <script setup>
     import useBoardStore from '~/Store';
-
+    
     const store = useBoardStore();
-    const {undoMove} = store;
+    const {redoMove} = store;
 
-    const handleundo = () => {
-        undoMove();
+    const handleRedo = () => {
+        redoMove();
     }
+
 </script>
 
-
 <template>
-    <button class="undo" @click="handleundo">
-        Undo
+    <button class="redo" @click="handleRedo">
+        Redo
     </button>
+
 </template>
 
 <style scoped>
-    .undo{
-        grid-column: 1/2;
+    .redo{
+        grid-column: 2/3;
         grid-row: 1;
         width: 100%;
         height: 60px;
@@ -32,11 +33,25 @@
         cursor: pointer;
     }
 
-    .undo:hover{
+    .redo:hover{
         background-color: rgb(83, 83, 83);
     }
 
-    .undo:active{
+    .redo:active{
         background-color: rgb(58, 58, 58);
+    }
+
+    @media(max-width: 1070px){
+        .redo{
+            font-size: 1.2rem;
+            height: 50px;
+        }
+    }
+
+    @media(max-width: 480px){
+        .redo{
+            font-size: 1rem;
+            height: 40px;
+        }
     }
 </style>

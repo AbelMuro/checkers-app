@@ -39,4 +39,24 @@
         grid-template-columns: repeat(8, 1fr);
         grid-template-rows: repeat(8, 1fr);
     }
+
+    @media(max-width: 1070px){
+        .board{
+            justify-self: center;
+        }
+    }
+
+    @media(max-width: 750px){
+        .board{
+            width: 450px;
+            height: 450px;
+        }
+    }
+
+    @media(max-width: 480px){
+        .board{
+            width: 330px;
+            height: 330px;
+        }
+    }
 </style>

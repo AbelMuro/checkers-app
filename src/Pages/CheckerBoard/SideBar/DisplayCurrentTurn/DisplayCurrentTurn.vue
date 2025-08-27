@@ -19,5 +19,19 @@
         font-weight: 800;
         text-transform: capitalize;
         color: white;
+        margin: 0px;
     }  
+
+    @media(max-width: 1070px){
+        .title{
+            font-size: 1.5rem;
+            align-self: start;
+        }
+    }
+
+    @media(max-width: 750px){
+        .title{
+            font-size: 1rem;
+        }
+    }
 </style>

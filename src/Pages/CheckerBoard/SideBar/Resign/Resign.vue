@@ -39,4 +39,19 @@
     .resign:active{
         background-color: rgb(58, 58, 58);
     }
+
+    @media(max-width: 1070px){
+        .resign{
+            font-size: 1.2rem;
+            height: 50px;
+        }
+    }
+
+    @media(max-width: 480px){
+        .resign{
+            font-size: 1rem;
+            height: 40px;
+        }
+    }
+
 </style>

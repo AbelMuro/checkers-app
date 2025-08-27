@@ -8,14 +8,13 @@
 </script>
 
 <template>
-    <section class="container">
-        <div className="header">
+    <section class="sidebar">
+        <div className="sidebar_header">
             <DisplayCurrentTurn/>
             <CapturedPieces/>
             <PieceMustCapture/>
         </div>
-
-        <div class="buttons">
+        <div class="sidebar_buttons">
             <Undo/>
             <Redo/>
             <Resign/>
@@ -24,7 +23,7 @@
 </template>
 
 <style scoped>
-    .container{
+    .sidebar{
         grid-row: 2/3;
         grid-column: 2;
         width: 300px;
@@ -38,18 +37,52 @@
         background-color: rgb(12, 12, 12);
     }
 
-    .header{
+    .sidebar_header{
         display: flex;
         flex-direction: column;
         align-items: center;
         row-gap: 15px;
     }  
 
-    .buttons{
+    .sidebar_buttons{
         width: 100%;
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         column-gap: 10px;
         row-gap: 15px;
+    }
+
+    @media(max-width: 1070px){
+        .sidebar{
+            flex-direction: row;
+            justify-self: center;            
+            align-self: center;
+            grid-column: 1;
+            grid-row: 3/4;
+            width: 700px;
+            height: auto;
+        }
+
+        .sidebar_buttons{
+            width: 200px;
+        }
+    }
+
+    @media(max-width: 750px){
+        .sidebar{
+            width: 450px;
+        }
+    }
+
+    @media(max-width: 480px){
+        .sidebar{
+            width: 330px;
+        }
+
+        .sidebar_buttons{
+            width: 130px;
+            column-gap: 5px;
+            row-gap: 10px;
+        }
     }
 </style>

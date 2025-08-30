@@ -15,7 +15,7 @@
 
     const isLegalSquare = computed(() => {
         return legal_moves.value[row][column];
-    })
+    });
 
     const handleSquare = () => {
         if(!isLegalSquare.value) return;

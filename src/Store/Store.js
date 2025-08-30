@@ -59,13 +59,18 @@ const useBoardStore = defineStore('board', {
                 ['', '', '', '', '', '' ,'', ''],
                 ['', '', '', '', '', '' ,'', ''],
             ],
-            player: 'red',
+
+            player_color: 'red',
+            current_turn: 'red',
+            difficulty: '',
+
             resign: false,
+
             piece_to_be_moved: '',
             piece_can_multi_take: false,
             pieces_must_take: [],
-            current_turn: 'red',
             pieces_to_be_taken: [],
+
             captured_pieces: {
                 red: 0,
                 black: 0
@@ -77,6 +82,12 @@ const useBoardStore = defineStore('board', {
             }
         }),
     actions: {
+        setPlayerColor(color) {
+            this.player_color = color
+        },
+        setDifficulty(diff){
+            this.difficulty = diff;
+        },
         setPiece(piece) {
             this.piece_to_be_moved = piece;
         },

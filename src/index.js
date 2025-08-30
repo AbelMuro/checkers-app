@@ -4,6 +4,7 @@ import {createWebHistory, createRouter} from 'vue-router';
 import CheckerBoard from './Pages/CheckerBoard';
 import Menu from './Pages/Menu';
 import GameRules from './Pages/GameRules';
+import SelectOptions from './Pages/SelectOptions';
 import App from './App.vue'
 
 const router = createRouter({
@@ -11,7 +12,8 @@ const router = createRouter({
     routes: [
         {path: '/', component: Menu},
         {path: '/checkerboard', component: CheckerBoard},
-        {path: '/gamerules', component: GameRules}
+        {path: '/gamerules', component: GameRules},
+        {path: '/selectoptions', component: SelectOptions}
     ],
 })
 

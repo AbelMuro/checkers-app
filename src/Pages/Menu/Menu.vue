@@ -7,7 +7,6 @@
         router.push(route);
     }
 
-
 </script>
 
 <template>
@@ -16,7 +15,7 @@
             World Class Checkers
         </h1>
         <ul class="menu_options">
-            <li class="menu_option" @click="() => handleOption('/checkerboard')">
+            <li class="menu_option" @click="() => handleOption('/selectoptions')">
                 Play Game
             </li> 
             <li class="menu_option" @click="() => handleOption('/gamerules')">

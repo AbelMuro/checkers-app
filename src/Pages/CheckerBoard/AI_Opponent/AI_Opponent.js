@@ -22,10 +22,12 @@ function AI_Opponent() {
                 body: JSON.stringify({board: board.value})
             });
             if(response.status === 200){
-
+                const result = await response.text();
+                console.log(result);
             }
-            else{
-                
+            else if(response.status === 501){
+                const result = await response.text();
+                console.log(result);
             } 
         }
         catch(error){

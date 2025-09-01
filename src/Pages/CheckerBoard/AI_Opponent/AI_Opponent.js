@@ -23,11 +23,11 @@ function AI_Opponent() {
             });
             if(response.status === 200){
                 const result = await response.text();
-                console.log(result);
+                console.log('200', result);
             }
             else if(response.status === 501){
                 const result = await response.text();
-                console.log(result);
+                console.log('501', result);
             } 
         }
         catch(error){

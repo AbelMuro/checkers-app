@@ -3,6 +3,7 @@
     import {computed} from 'vue';
     import {storeToRefs} from 'pinia';
     import images from './images';
+    import {motion, AnimatePresence} from 'motion-v';
 
     const {column, row} = defineProps({
         column: Number,
@@ -19,12 +20,12 @@
     const pieceColor = computed(() => {
         const temp = board.value[row][column];
         return temp.slice(0, temp.indexOf(' '));
-    })
+    });
 
     const isQueen = computed(() => {
         const temp = board.value[row][column];
         return temp?.includes('queen');
-    })
+    });
 
     const handlePiece = () => {
         if(player_color.value !== current_turn.value) return;
@@ -38,12 +39,18 @@
         setPiece({pieceId: pieceId.value, row, column});
         isQueen.value ? createLegalSquaresForQueen() : createLegalSquares();            
     }
-
 </script>
 
 
 <template>
-    <img v-show="pieceId !== ''" class="piece" :src="isQueen ? images[`queen${pieceColor}`] : images[pieceColor]" @click="handlePiece"/>
+    <AnimatePresence>
+        <motion.img 
+            :layoutId="pieceId"
+            v-show="pieceId !== ''" 
+            class="piece" 
+            :src="isQueen ? images[`queen${pieceColor}`] : images[pieceColor]" 
+            @click="handlePiece" />
+    </AnimatePresence>
 </template>
 
 
@@ -52,6 +59,7 @@
         width: 50px;
         height: 50px;
         cursor: pointer;
+        transition: all 0s;
     }
 
     @media(max-width: 750px){

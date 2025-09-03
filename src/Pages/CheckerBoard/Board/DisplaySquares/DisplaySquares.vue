@@ -1,6 +1,8 @@
 <script setup>
     import {ref, onBeforeMount} from 'vue';
     import Square from './Square';
+    import {DndProvider} from 'vue3-dnd';
+    import {HTML5Backend} from 'react-dnd-html5-backend';
 
     const squares = ref([]);
 
@@ -29,12 +31,14 @@
 
 
 <template>
-    <div 
-        v-for="(square, i) in squares" 
-        :key="`${square[0]} ${i}`" 
-        :class="square[0]">
-            <Square :column="square[1]" :row="square[2]"/>
-    </div>
+    <DndProvider :backend="HTML5Backend">
+        <div 
+            v-for="(square, i) in squares" 
+            :key="`${square[0]} ${i}`" 
+            :class="square[0]">
+                <Square :column="square[1]" :row="square[2]"/>
+        </div>
+    </DndProvider>
 </template>
 
 

@@ -1,9 +1,10 @@
 <script setup>
     import useBoardStore from '~/Store';
-    import {computed} from 'vue';
+    import {computed, watch} from 'vue';
     import {storeToRefs} from 'pinia';
     import images from './images';
-    import {motion, AnimatePresence} from 'motion-v';
+    import {motion} from 'motion-v';
+    import {useDrag} from 'vue3-dnd';
 
     const {column, row} = defineProps({
         column: Number,
@@ -12,10 +13,16 @@
     const store = useBoardStore();
     const {board, current_turn, player_color, piece_can_multi_take, pieces_must_take} = storeToRefs(store);
     const {setPiece, createLegalSquares, createLegalSquaresForQueen} = store;
+    const pieceId = computed(() => board.value[row][column]);  
 
-    const pieceId = computed(() => {
-        return board.value[row][column];
-    });    
+    const [collect, drag] = useDrag(() => ({
+        type: 'piece',
+        item: () => ({name: pieceId}),
+        collect: monitor => ({
+            isDragging: monitor.isDragging(),
+        }),
+    }))
+    const isDragging = computed(() => collect.value.isDragging);
 
     const pieceColor = computed(() => {
         const temp = board.value[row][column];
@@ -39,27 +46,52 @@
         setPiece({pieceId: pieceId.value, row, column});
         isQueen.value ? createLegalSquaresForQueen() : createLegalSquares();            
     }
+
+    watch(isDragging, () => {
+        if(!isDragging.value) return;
+
+        handlePiece();
+    }, {flush: 'post'})
+
+
+    /* 
+        this is where i left off, i need to finish implementing the
+        drag and drop feature in this component
+    */
+
 </script>
 
 
 <template>
-    <AnimatePresence>
-        <motion.img 
+    <div class='piece_container' :ref="drag">
+        <motion.img  
+            v-if="!isDragging"      
+            v-show="pieceId !== ''"  
+            class="piece"                 
             :layoutId="pieceId"
-            v-show="pieceId !== ''" 
-            class="piece" 
             :src="isQueen ? images[`queen${pieceColor}`] : images[pieceColor]" 
             @click="handlePiece" />
-    </AnimatePresence>
+    </div>
 </template>
 
 
 <style scoped>
+    .piece_container{
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        inset: 0;
+        margin: auto;
+    }
+
     .piece{
         width: 50px;
         height: 50px;
         cursor: pointer;
-        transition: all 0s;
+        transition: none;
     }
 
     @media(max-width: 750px){

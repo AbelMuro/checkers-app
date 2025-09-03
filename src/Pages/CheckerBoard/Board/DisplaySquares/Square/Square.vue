@@ -2,6 +2,7 @@
     import {computed} from 'vue';
     import {storeToRefs} from 'pinia';
     import useBoardStore from '~/Store';
+    import {useDrop} from 'vue3-dnd';
     import Piece from './Piece'
 
     const {row, column} = defineProps({
@@ -10,24 +11,32 @@
     });
 
     const store = useBoardStore();
-    const {legal_moves} = storeToRefs(store);
+    const {legal_moves, piece_to_be_moved} = storeToRefs(store);
     const {movePiece} = store;
+    const isLegalSquare = computed(() => legal_moves.value[row][column]);
 
-    const isLegalSquare = computed(() => {
-        return legal_moves.value[row][column];
-    });
 
     const handleSquare = () => {
         if(!isLegalSquare.value) return;
-
         movePiece(column, row);
-    }
+    }   
+
+    const [collect, drop] = useDrop(() => ({
+        accept: 'piece',
+        drop: (item, monitor) => {
+            if(!monitor.didDrop()) return;
+            handleSquare();
+        },
+    }))
+
 </script>
 
 <template>
-    <div 
+    <div
         class="square"
-        @click="handleSquare">
+        @click="handleSquare"
+        :ref="drop"
+        >
             <Piece :row="row" :column="column"/>
             <div class="whiteCircle" v-show="isLegalSquare"></div>
     </div>
@@ -40,6 +49,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        position: relative;
     }
 
     .whiteCircle{

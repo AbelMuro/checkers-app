@@ -18,6 +18,16 @@
     const [collect, drag] = useDrag(() => ({
         type: 'piece',
         item: () => ({name: pieceId}),
+        canDrag: () => {
+            if(player_color.value !== current_turn.value) return false;
+            if(player_color.value !== pieceColor.value) return false;
+            if(piece_can_multi_take.value) return false;
+            if(pieces_must_take.value.length){
+                const piece = pieces_must_take.value.filter((piece) => piece.pieceId === pieceId.value)
+                if(!piece.length) return false;
+            } 
+            return true;
+        },
         collect: monitor => ({
             isDragging: monitor.isDragging(),
         }),
@@ -65,6 +75,7 @@
 <template>
     <div class='piece_container' :ref="drag">
         <motion.img  
+            :ref="drag"
             v-if="!isDragging"      
             v-show="pieceId !== ''"  
             class="piece"                 
@@ -77,19 +88,22 @@
 
 <style scoped>
     .piece_container{
-        width: 100%;
-        height: 100%;
+        width: 50px;
+        height: 50px;
         display: flex;
         justify-content: center;
         align-items: center;
         position: absolute;
         inset: 0;
         margin: auto;
+        border-radius: 100px;
+        overflow: hidden;
+        transform: translate(0,0)
     }
 
     .piece{
-        width: 50px;
-        height: 50px;
+        width: 100%;
+        height: 100%;
         cursor: pointer;
         transition: none;
     }

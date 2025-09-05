@@ -11,7 +11,7 @@
     });
 
     const store = useBoardStore();
-    const {legal_moves, piece_to_be_moved} = storeToRefs(store);
+    const {legal_moves} = storeToRefs(store);
     const {movePiece} = store;
     const isLegalSquare = computed(() => legal_moves.value[row][column]);
 
@@ -21,10 +21,9 @@
         movePiece(column, row);
     }   
 
-    const [collect, drop] = useDrop(() => ({
+    const [_, drop] = useDrop(() => ({
         accept: 'piece',
-        drop: (item, monitor) => {
-            if(!monitor.didDrop()) return;
+        drop: () => {
             handleSquare();
         },
     }))
@@ -37,8 +36,8 @@
         @click="handleSquare"
         :ref="drop"
         >
-            <Piece :row="row" :column="column"/>
-            <div class="whiteCircle" v-show="isLegalSquare"></div>
+            <Piece :row="row" :column="column" v-if="!isLegalSquare"/>
+            <div class="whiteCircle" v-else></div>
     </div>
 </template>
 

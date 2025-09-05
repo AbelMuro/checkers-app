@@ -11,7 +11,6 @@ import {storeToRefs} from 'pinia';
 function AI_Opponent() {
     const store = useBoardStore();
     const {current_turn, board, player_color} = storeToRefs(store);
-    return;
 
     const calculateMove = async () => {
         try{

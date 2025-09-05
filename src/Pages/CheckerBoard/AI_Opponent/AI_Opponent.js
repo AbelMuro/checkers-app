@@ -3,14 +3,14 @@ import {watch} from 'vue';
 import {storeToRefs} from 'pinia';
 
 /* 
-    this is where i left off, i should finish implementing the logic
-    for the following hook and also finish the logic for the /ai_move 
-    endpoint.
+    this is where i left off, i finally have the best move for the AI opponent,
+    now what i need to do is translate the best move from square-to-square notation
+    into a 2D array
 */
 
 function AI_Opponent() {
     const store = useBoardStore();
-    const {current_turn, board, player_color} = storeToRefs(store);
+    const {current_turn, history, player_color} = storeToRefs(store);
 
     const calculateMove = async () => {
         try{
@@ -19,15 +19,15 @@ function AI_Opponent() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({board: board.value})
+                body: JSON.stringify({moves: history.value.past})
             });
             if(response.status === 200){
                 const result = await response.text();
-                console.log('200', result);
+                console.log(result);
             }
             else if(response.status === 501){
                 const result = await response.text();
-                console.log('501', result);
+                console.log(result);
             } 
         }
         catch(error){
@@ -36,7 +36,7 @@ function AI_Opponent() {
         }
     }
 
-    watch([current_turn, board], ([current_turn, board]) => {
+    watch([current_turn], ([current_turn]) => {
         if(current_turn.value === player_color.value) return;
         calculateMove();
     })

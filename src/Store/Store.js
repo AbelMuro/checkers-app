@@ -35,7 +35,16 @@ import {capturePieces} from './Functions/Capture';
         If it was called, then it will cause unexpected bugs. So i had to implement a separate logic for these buttons.
 */ 
 
-
+const darkSquares = [
+        ['dark', '', 'dark', '', 'dark', '', 'dark', ''],
+        ['', 'dark', '', 'dark', '', 'dark', '', 'dark'],
+        ['dark', '', 'dark', '', 'dark', '', 'dark', '',],
+        ['', 'dark', '', 'dark', '', 'dark', '', 'dark'],
+        ['dark', '', 'dark', '', 'dark', '', 'dark', '',],
+        ['', 'dark', '', 'dark', '', 'dark', '', 'dark'],
+        ['dark', '', 'dark', '', 'dark', '', 'dark', ''],
+        ['', 'dark', '', 'dark', '', 'dark', '', 'dark'],
+    ];
 
 const useBoardStore = defineStore('board', {
     state: () => ({
@@ -170,6 +179,9 @@ const useBoardStore = defineStore('board', {
                 this.changeTurn();                
             }
         },
+        AImovePiece(move){
+            console.log(move);
+        },  
         undoMove(){
             const move = this.history.past.pop();
             if(!move) return;

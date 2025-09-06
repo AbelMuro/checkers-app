@@ -10,7 +10,8 @@ import {storeToRefs} from 'pinia';
 
 function AI_Opponent() {
     const store = useBoardStore();
-    const {current_turn, history, player_color} = storeToRefs(store);
+    const {current_turn, board, player_color} = storeToRefs(store);
+    const {AImovePiece} = store;
 
     const calculateMove = async () => {
         try{
@@ -19,11 +20,11 @@ function AI_Opponent() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({moves: history.value.past})
+                body: JSON.stringify({board: board.value})
             });
             if(response.status === 200){
                 const result = await response.text();
-                console.log(result);
+                AImovePiece(result);
             }
             else if(response.status === 501){
                 const result = await response.text();
@@ -36,7 +37,7 @@ function AI_Opponent() {
         }
     }
 
-    watch([current_turn], ([current_turn]) => {
+    watch([current_turn, board], ([current_turn]) => {
         if(current_turn.value === player_color.value) return;
         calculateMove();
     })

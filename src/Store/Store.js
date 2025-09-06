@@ -162,8 +162,8 @@ const useBoardStore = defineStore('board', {
                 this.history.future.pop();
                 
             //we check to see if the piece can multi-take
-            if(this.pieces_to_be_taken.length) {                //this is the issue
-                this.piece_can_multi_take = true;               //this will prevent any other pieces from being moved
+            if(this.pieces_to_be_taken.length) {              
+                this.piece_can_multi_take = true;              
                 this.setPiece({
                     pieceId: this.board[toRow][toColumn],
                     column: toColumn,

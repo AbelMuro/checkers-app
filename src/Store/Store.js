@@ -180,7 +180,14 @@ const useBoardStore = defineStore('board', {
             }
         },
         AImovePiece(move){
-            console.log(move);
+            const from = move.from;
+            const to = move.to;
+            const pieceId = move.piece;
+            const capture = move.capture;
+
+            this.board[from.row][from.col] = '';
+            this.board[to.row][to.col] = pieceId;
+            this.changeTurn();
         },  
         undoMove(){
             const move = this.history.past.pop();

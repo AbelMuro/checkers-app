@@ -23,7 +23,7 @@ function AI_Opponent() {
                 body: JSON.stringify({board: board.value})
             });
             if(response.status === 200){
-                const result = await response.text();
+                const result = await response.json();
                 AImovePiece(result);
             }
             else if(response.status === 501){
@@ -38,7 +38,7 @@ function AI_Opponent() {
     }
 
     watch([current_turn, board], ([current_turn]) => {
-        if(current_turn.value === player_color.value) return;
+        if(current_turn === player_color.value) return;
         calculateMove();
     })
 }

@@ -25,8 +25,6 @@
             alternate = !alternate;
         }   
     })
-
-
 </script>
 
 

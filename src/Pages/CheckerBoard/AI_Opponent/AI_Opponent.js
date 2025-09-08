@@ -10,7 +10,7 @@ import {storeToRefs} from 'pinia';
 
 function AI_Opponent() {
     const store = useBoardStore();
-    const {current_turn, board, player_color} = storeToRefs(store);
+    const {current_turn, board, player_color, history} = storeToRefs(store);
     const {AImovePiece} = store;
 
     const calculateMove = async () => {
@@ -37,10 +37,15 @@ function AI_Opponent() {
         }
     }
 
-    watch([current_turn, board], ([current_turn]) => {
+    watch([current_turn, board, history], ([current_turn,_ , {time_traveling}]) => {
+        console.log(time_traveling);
         if(current_turn === player_color.value) return;
-        calculateMove();
-    })
+        if(time_traveling) return;
+        setTimeout(() => {
+           calculateMove(); 
+        }, 1000)
+        
+    }, {flush: 'post'})
 }
 
 export default AI_Opponent;

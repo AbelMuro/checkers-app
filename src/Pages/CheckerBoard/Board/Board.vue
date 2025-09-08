@@ -5,15 +5,16 @@
     import { storeToRefs } from 'pinia';
 
     const store = useBoardStore()
-    const {current_turn, history} = storeToRefs(store);
+    const {current_turn, history, player_color} = storeToRefs(store);
     const {checkForPossibleTakes} = store;
 
     const time_traveling = computed(() => {
         return history.value.time_traveling;
     })
 
-    watch([current_turn, time_traveling], ([_, time_traveling]) => {
+    watch([current_turn, time_traveling], ([current_turn, time_traveling]) => {
         if(time_traveling) return;
+        if(player_color.value !== current_turn) return;
 
         checkForPossibleTakes();
     }, {deep: true, flush: 'post'})

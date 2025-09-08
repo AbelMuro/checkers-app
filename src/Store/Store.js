@@ -35,16 +35,14 @@ import {capturePieces} from './Functions/Capture';
         If it was called, then it will cause unexpected bugs. So i had to implement a separate logic for these buttons.
 */ 
 
-const darkSquares = [
-        ['dark', '', 'dark', '', 'dark', '', 'dark', ''],
-        ['', 'dark', '', 'dark', '', 'dark', '', 'dark'],
-        ['dark', '', 'dark', '', 'dark', '', 'dark', '',],
-        ['', 'dark', '', 'dark', '', 'dark', '', 'dark'],
-        ['dark', '', 'dark', '', 'dark', '', 'dark', '',],
-        ['', 'dark', '', 'dark', '', 'dark', '', 'dark'],
-        ['dark', '', 'dark', '', 'dark', '', 'dark', ''],
-        ['', 'dark', '', 'dark', '', 'dark', '', 'dark'],
-    ];
+
+
+/*
+
+    this is where i left off, i need to continue testing the undo action method to make sure everything is working properly
+    then i can test the redo aciton method.
+
+*/
 
 const useBoardStore = defineStore('board', {
     state: () => ({
@@ -180,19 +178,44 @@ const useBoardStore = defineStore('board', {
             }
         },
         AImovePiece(move){
+            console.log(move);
+            let firstPromotion = false;
             const from = move.from;
             const to = move.to;
-            const pieceId = move.piece;
+            let pieceId = move.piece;
             const capture = move.capture;
+            const opposingColor = this.player_color;
 
             this.board[from.row][from.col] = '';
             this.board[to.row][to.col] = pieceId;
+            if(capture)
+                this.board[capture.row][capture.col] = '';
+            if((to.row === 0 || to.row === 7) && !pieceId.includes('queen')){
+                firstPromotion = true;
+                pieceId = `${pieceId} queen`;
+            }
+                
+            //we record the piece that moved
+            this.history.past.push({
+                from: {pieceId: '', column: from.col, row: from.row},
+                to: {pieceId, column: to.col, row: to.row},
+                piecesTaken: capture ? [{column: capture.col, row: capture.row, pieceId: capture.pieceId}] : [],
+                promotion: firstPromotion,
+            });
+
+            this.captured_pieces[opposingColor] += 1;
+
+            //we remove all future recorded moves
+            while(this.history.future.length)
+                this.history.future.pop();
+
             this.changeTurn();
         },  
         undoMove(){
             const move = this.history.past.pop();
             if(!move) return;
 
+            console.log('undoMove', move);
             this.history.future.push(move);
             this.history.time_traveling = true;
 

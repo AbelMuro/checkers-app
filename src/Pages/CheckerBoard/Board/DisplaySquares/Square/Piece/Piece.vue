@@ -64,18 +64,13 @@
     }, {flush: 'post'})
 
 
-    /* 
-        this is where i left off, i need to finish implementing the
-        drag and drop feature in this component
-    */
-
 </script>
 
 
 <template>
     <div class='piece_container' :ref="drag">
-        <motion.img  
-            :ref="drag"
+        <motion.img 
+            :key="pieceId"
             v-if="!isDragging"      
             v-show="pieceId !== ''"  
             class="piece"                 
@@ -97,7 +92,6 @@
         inset: 0;
         margin: auto;
         border-radius: 100px;
-        overflow: hidden;
         transform: translate(0,0)
     }
 

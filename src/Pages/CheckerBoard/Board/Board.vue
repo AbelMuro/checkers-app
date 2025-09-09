@@ -10,7 +10,7 @@
 
     const time_traveling = computed(() => {
         return history.value.time_traveling;
-    })
+    });
 
     watch([current_turn, time_traveling], ([current_turn, time_traveling]) => {
         if(time_traveling) return;
@@ -18,7 +18,6 @@
 
         checkForPossibleTakes();
     }, {deep: true, flush: 'post'})
-
 </script>
 
 <template>

@@ -39,8 +39,8 @@ import {capturePieces} from './Functions/Capture';
 
 /*
 
-    this is where i left off, i need to continue testing the undo action method to make sure everything is working properly
-    then i can test the redo aciton method.
+    this is where i left off, i need to find a way to prevent the watcher from being called in the AI_Opponent.js 
+    when the setTimeout() updates the board state in the movePiece() method
 
 */
 
@@ -130,20 +130,46 @@ const useBoardStore = defineStore('board', {
             const fromColumn = this.piece_to_be_moved.column;
             const fromRow = this.piece_to_be_moved.row;
             const newSquare = this.legal_moves[toRow][toColumn];
+            let piecesTaken = [];
             let pieceId = this.piece_to_be_moved.pieceId;
-            pieceId = newSquare.includes('promote') ? `${pieceId} queen` : pieceId
             const opposingColor = pieceId.includes('red') ? 'black' : 'red';
 
             this.history.time_traveling = '';
 
-            //we move the piece in the board
-            this.board[toRow][toColumn] = pieceId;
-            this.legal_moves[toRow][toColumn] = '';
-            this.board[fromRow][fromColumn] = '';
+            //we move the piece in the board            
+            if(this.pieces_to_be_taken.length && newSquare.includes('take')){
+                let piece, moveToSquare, currentLegalSquare;
+                let jumps = newSquare[newSquare.length - 1];
+                    for(let i = 1; i <= Number(jumps); i++){         
+                        piece = this.pieces_to_be_taken.shift();
+                        if(!piece) break;
+                        moveToSquare = piece.newSquare;
+                        currentLegalSquare = this.legal_moves[moveToSquare.row][moveToSquare.column];
+                        if(i === 1){
+                            this.board[piece.row][piece.column] = '';                       //capture the piece
+                            this.board[fromRow][fromColumn] = '';                           //we move the piece
+                            this.board[moveToSquare.row][moveToSquare.column] = pieceId;    //to this square                            
+                        }
+                        else
+                            setTimeout(() => {
+                                this.board[piece.row][piece.column] = '';                       //capture the piece
+                                this.board[fromRow][fromColumn] = '';                           //we move the piece
+                                this.board[moveToSquare.row][moveToSquare.column] = pieceId;    //to this square
+                            }, 400)
+                        piecesTaken.push(piece);
 
-            //we check to see if the piece has taken any other pieces 
-            // (the following function will remove pieces from the board)
-            const piecesTaken = capturePieces(newSquare, this.board, this.pieces_to_be_taken);
+                        if(i === Number(jumps) && currentLegalSquare.includes('promote'))
+                            setTimeout(() => {
+                                this.board[moveToSquare.row][moveToSquare.column] = `${pieceId} queen`;
+                            }, 500)
+                    }
+            }
+            else{
+                this.board[toRow][toColumn] = newSquare.includes('promote') ? `${pieceId} queen` : pieceId;
+                this.legal_moves[toRow][toColumn] = '';
+                this.board[fromRow][fromColumn] = '';  
+                piecesTaken = capturePieces(newSquare, this.board, this.pieces_to_be_taken);                
+            }
 
             //we record the piece that moved
             this.history.past.push({

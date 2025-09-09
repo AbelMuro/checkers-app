@@ -35,13 +35,13 @@ export const diagonalTakes = (currentPiece, board, legal_moves, pieces_to_be_tak
         if((board[row - 1] && board[row - 1][column - 1]?.includes('black')) &&         //north west take
             (board[row - 2] && board[row - 2][column - 2] === '')){
                 legal_moves[row - 2][column - 2] = (row === 2 && !currentPiece.includes('queen')) ? `take black north west and promote ${jumps}` : `take black north west ${jumps}`;
-                pieces_to_be_taken.push({pieceId: board[row - 1][column - 1], row: row - 1, column: column - 1});
+                pieces_to_be_taken.push({pieceId: board[row - 1][column - 1], row: row - 1, column: column - 1, newSquare: {row: row - 2, column: column - 2}});
                 diagonalTakes(currentPiece, board, legal_moves, pieces_to_be_taken, current_turn, column - 2, row - 2, jumps + 1);
             }         
         if((board[row - 1] && board[row - 1][column + 1]?.includes('black')) &&         //north east take
             (board[row - 2] && board[row - 2][column + 2] === '')){
                 legal_moves[row - 2][column + 2] = (row === 2 && !currentPiece.includes('queen')) ? `take black north east and promote ${jumps}` : `take black north east ${jumps}`;
-                pieces_to_be_taken.push({pieceId: board[row - 1][column + 1], row: row - 1, column: column + 1});
+                pieces_to_be_taken.push({pieceId: board[row - 1][column + 1], row: row - 1, column: column + 1, newSquare: {row: row - 2, column: column + 2}});
                 diagonalTakes(currentPiece, board, legal_moves, pieces_to_be_taken, current_turn, column + 2, row - 2, jumps + 1);
             }
     }
@@ -49,13 +49,13 @@ export const diagonalTakes = (currentPiece, board, legal_moves, pieces_to_be_tak
         if((board[row + 1] && board[row + 1][column - 1]?.includes('red')) &&           //south west take
             (board[row + 2] && board[row + 2][column - 2] === '')){
                 legal_moves[row + 2][column - 2] = (row === 5 && !currentPiece.includes('queen')) ? `take red south west and promote ${jumps}` : `take red south west ${jumps}`;
-                pieces_to_be_taken.push({pieceId: board[row + 1][column - 1], row: row + 1, column: column - 1});
+                pieces_to_be_taken.push({pieceId: board[row + 1][column - 1], row: row + 1, column: column - 1, newSquare: {row: row + 2, column: column - 2}});
                 diagonalTakes(currentPiece, board, legal_moves, pieces_to_be_taken, current_turn, column - 2, row + 2, jumps + 1);
             }
         if((board[row + 1] && board[row + 1][column + 1]?.includes('red')) &&             //south east take
             (board[row + 2] && board[row + 2][column + 2] === '')) {
                 legal_moves[row + 2][column + 2] = (row === 5 && !currentPiece.includes('queen')) ? `take red south east and promote ${jumps}` : `take red south east ${jumps}`;
-                pieces_to_be_taken.push({pieceId: board[row + 1][column + 1], row: row + 1, column: column + 1});
+                pieces_to_be_taken.push({pieceId: board[row + 1][column + 1], row: row + 1, column: column + 1, newSquare: {row: row + 2, column: column + 2}});
                 diagonalTakes(currentPiece, board, legal_moves, pieces_to_be_taken, current_turn, column + 2, row + 2, jumps + 1);
             }        
     }
@@ -67,25 +67,25 @@ export const diagonalQueenTakes = (board, legal_moves, pieces_to_be_taken, curre
         if((board[row - 1] && board[row - 1][column - 1]?.includes('black')) &&         //north west take
             (board[row - 2] && board[row - 2][column - 2] === '') && !hasPieceAlreadyBeenChecked(board[row - 1][column - 1], pieces_to_be_taken)){
                 legal_moves[row - 2][column - 2] = `take black north west ${jumps}`;
-                pieces_to_be_taken.push({pieceId: board[row - 1][column - 1], row: row - 1, column: column - 1});
+                pieces_to_be_taken.push({pieceId: board[row - 1][column - 1], row: row - 1, column: column - 1, newSquare: {row: row - 2, column: column - 2}});
                 diagonalQueenTakes(board, legal_moves, pieces_to_be_taken, current_turn, column - 2, row - 2, jumps + 1);
             }  
         if((board[row - 1] && board[row - 1][column + 1]?.includes('black')) &&         //north east take
             (board[row - 2] && board[row - 2][column + 2] === '') && !hasPieceAlreadyBeenChecked(board[row - 1][column + 1], pieces_to_be_taken)){
                 legal_moves[row - 2][column + 2] = `take black north east ${jumps}`;
-                pieces_to_be_taken.push({pieceId: board[row - 1][column + 1], row: row - 1, column: column + 1});
+                pieces_to_be_taken.push({pieceId: board[row - 1][column + 1], row: row - 1, column: column + 1, newSquare: {row: row - 2, column: column + 2}});
                 diagonalQueenTakes(board, legal_moves, pieces_to_be_taken, current_turn, column + 2, row - 2, jumps + 1);
             }
         if((board[row + 1] && board[row + 1][column - 1]?.includes('black')) &&           //south west take
             (board[row + 2] && board[row + 2][column - 2] === '') && !hasPieceAlreadyBeenChecked(board[row + 1][column - 1], pieces_to_be_taken) ){
                 legal_moves[row + 2][column - 2] = `take black south west ${jumps}`;
-                pieces_to_be_taken.push({pieceId: board[row + 1][column - 1], row: row + 1, column: column - 1});
+                pieces_to_be_taken.push({pieceId: board[row + 1][column - 1], row: row + 1, column: column - 1, newSquare: {row: row + 2, column: column - 2}});
                 diagonalQueenTakes(board, legal_moves, pieces_to_be_taken, current_turn, column - 2, row + 2, jumps + 1);
             }
-        if((board[row + 1] && board[row + 1][column + 1]?.includes('black')) &&             //south east take
+        if((board[row + 1] && board[row + 1][column + 1]?.includes('black')) &&           //south east take
             (board[row + 2] && board[row + 2][column + 2] === '') && !hasPieceAlreadyBeenChecked(board[row + 1][column + 1], pieces_to_be_taken)) {
                 legal_moves[row + 2][column + 2] = `take black south east ${jumps}`;
-                pieces_to_be_taken.push({pieceId: board[row + 1][column + 1], row: row + 1, column: column + 1});
+                pieces_to_be_taken.push({pieceId: board[row + 1][column + 1], row: row + 1, column: column + 1, newSquare: {row: row + 2, column: column + 2}});
                 diagonalQueenTakes(board, legal_moves, pieces_to_be_taken, current_turn, column + 2, row + 2, jumps + 1);
             }          
     }
@@ -93,25 +93,25 @@ export const diagonalQueenTakes = (board, legal_moves, pieces_to_be_taken, curre
         if((board[row - 1] && board[row - 1][column - 1]?.includes('red')) &&         //north west take
             (board[row - 2] && board[row - 2][column - 2] === '') && !hasPieceAlreadyBeenChecked(board[row - 1][column - 1], pieces_to_be_taken)){
                 legal_moves[row - 2][column - 2] = `take red north west ${jumps}`;
-                pieces_to_be_taken.push({pieceId: board[row - 1][column - 1], row: row - 1, column: column - 1});
+                pieces_to_be_taken.push({pieceId: board[row - 1][column - 1], row: row - 1, column: column - 1, newSquare: {row: row - 2, column: column - 2}});
                 diagonalQueenTakes(board, legal_moves, pieces_to_be_taken, current_turn, column - 2, row - 2, jumps + 1);
             }  
         if((board[row - 1] && board[row - 1][column + 1]?.includes('red')) &&         //north east take
             (board[row - 2] && board[row - 2][column + 2] === '') && !hasPieceAlreadyBeenChecked(board[row - 1][column + 1], pieces_to_be_taken)){
                 legal_moves[row - 2][column + 2] = `take red north east ${jumps}`;
-                pieces_to_be_taken.push({pieceId: board[row - 1][column + 1], row: row - 1, column: column + 1});
+                pieces_to_be_taken.push({pieceId: board[row - 1][column + 1], row: row - 1, column: column + 1, newSquare: {row: row - 2, column: column + 2}});
                 diagonalQueenTakes(board, legal_moves, pieces_to_be_taken, current_turn, column + 2, row - 2, jumps + 1);
             }
         if((board[row + 1] && board[row + 1][column - 1]?.includes('red')) &&           //south west take
             (board[row + 2] && board[row + 2][column - 2] === '') && !hasPieceAlreadyBeenChecked(board[row + 1][column - 1], pieces_to_be_taken)){
                 legal_moves[row + 2][column - 2] = `take red south west ${jumps}`;
-                pieces_to_be_taken.push({pieceId: board[row + 1][column - 1], row: row + 1, column: column - 1});
+                pieces_to_be_taken.push({pieceId: board[row + 1][column - 1], row: row + 1, column: column - 1, newSquare: {row: row + 2, column: column - 2}});
                 diagonalQueenTakes(board, legal_moves, pieces_to_be_taken, current_turn, column - 2, row + 2, jumps + 1);
             }
         if((board[row + 1] && board[row + 1][column + 1]?.includes('red')) &&             //south east take
             (board[row + 2] && board[row + 2][column + 2] === '') && !hasPieceAlreadyBeenChecked(board[row + 1][column + 1], pieces_to_be_taken)) {
                 legal_moves[row + 2][column + 2] = `take red south east ${jumps}`;
-                pieces_to_be_taken.push({pieceId: board[row + 1][column + 1], row: row + 1, column: column + 1});
+                pieces_to_be_taken.push({pieceId: board[row + 1][column + 1], row: row + 1, column: column + 1, newSquare: {row: row + 2, column: column + 2}});
                 diagonalQueenTakes(board, legal_moves, pieces_to_be_taken, current_turn, column + 2, row + 2, jumps + 1);
             }   
     }

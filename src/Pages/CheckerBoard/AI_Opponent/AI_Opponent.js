@@ -38,9 +38,9 @@ function AI_Opponent() {
     }
 
     watch([current_turn, board, history], ([current_turn,_ , {time_traveling}]) => {
-        console.log(time_traveling);
         if(current_turn === player_color.value) return;
         if(time_traveling) return;
+        
         setTimeout(() => {
            calculateMove(); 
         }, 1000)

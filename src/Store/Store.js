@@ -136,31 +136,38 @@ const useBoardStore = defineStore('board', {
 
             this.history.time_traveling = '';
 
-            //we move the piece in the board            
+            //we capture any pieces, if there are no pieces to capture, then we simply move the piece    
             if(this.pieces_to_be_taken.length && newSquare.includes('take')){
                 let piece, moveToSquare, currentLegalSquare;
                 let jumps = newSquare[newSquare.length - 1];
+                let previousJump = null;
                     for(let i = 1; i <= Number(jumps); i++){         
                         piece = this.pieces_to_be_taken.shift();
                         if(!piece) break;
-                        moveToSquare = piece.newSquare;
+                        moveToSquare = piece.newSquare;                                    // the new square for the piece that is capturing another piece
                         currentLegalSquare = this.legal_moves[moveToSquare.row][moveToSquare.column];
                         if(i === 1){
+                            this.piece_can_multi_take = true;
                             this.board[piece.row][piece.column] = '';                       //capture the piece
                             this.board[fromRow][fromColumn] = '';                           //we move the piece
-                            this.board[moveToSquare.row][moveToSquare.column] = pieceId;    //to this square                            
+                            this.board[moveToSquare.row][moveToSquare.column] = pieceId;    //to this square     
+                            previousJump = {row: moveToSquare.row, column: moveToSquare.column}                       
                         }
                         else
                             setTimeout(() => {
+                                if(previousJump)
+                                    this.board[previousJump.row][previousJump.column] = '';
                                 this.board[piece.row][piece.column] = '';                       //capture the piece
-                                this.board[fromRow][fromColumn] = '';                           //we move the piece
                                 this.board[moveToSquare.row][moveToSquare.column] = pieceId;    //to this square
+                                previousJump = {row: moveToSquare.row, column: moveToSquare.column};
                             }, 400)
                         piecesTaken.push(piece);
 
-                        if(i === Number(jumps) && currentLegalSquare.includes('promote'))
+                        if(i === Number(jumps))
                             setTimeout(() => {
-                                this.board[moveToSquare.row][moveToSquare.column] = `${pieceId} queen`;
+                                this.piece_can_multi_take = false;
+                                if(currentLegalSquare.includes('promote'))
+                                    this.board[moveToSquare.row][moveToSquare.column] = `${pieceId} queen`;   
                             }, 500)
                     }
             }
@@ -186,16 +193,14 @@ const useBoardStore = defineStore('board', {
                 this.history.future.pop();
                 
             //we check to see if the piece can multi-take
-            if(this.pieces_to_be_taken.length) {              
-                this.piece_can_multi_take = true;              
+            if(this.pieces_to_be_taken.length) {                   
                 this.setPiece({
                     pieceId: this.board[toRow][toColumn],
                     column: toColumn,
                     row: toRow,
                 })
             }
-            else{
-                this.piece_can_multi_take = false;    
+            else{ 
                 this.resetPieceToBeMoved();
                 this.resetLegalMoves();
                 this.resetPiecesToBeTaken();
@@ -265,15 +270,6 @@ const useBoardStore = defineStore('board', {
             this.resetPiecesMustTake();
 
             this.current_turn = pieceId.includes('red') ? 'red' : 'black';            
-            this.setPiece({
-                pieceId,
-                column: from.column,
-                row: from.row
-            })
-
-            pieceId.includes('queen') ? 
-                this.createLegalSquaresForQueen() :
-                this.createLegalSquares();
         },
         redoMove() {
             const move = this.history.future.pop();

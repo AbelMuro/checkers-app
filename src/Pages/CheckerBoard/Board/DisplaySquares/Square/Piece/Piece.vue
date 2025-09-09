@@ -3,7 +3,7 @@
     import {computed, watch} from 'vue';
     import {storeToRefs} from 'pinia';
     import images from './images';
-    import {motion} from 'motion-v';
+    import {motion, AnimatePresence, useAnimationControls} from 'motion-v';
     import {useDrag} from 'vue3-dnd';
 
     const {column, row} = defineProps({
@@ -13,6 +13,7 @@
     const store = useBoardStore();
     const {board, current_turn, player_color, piece_can_multi_take, pieces_must_take} = storeToRefs(store);
     const {setPiece, createLegalSquares, createLegalSquaresForQueen} = store;
+    const controls = useAnimationControls();
     const pieceId = computed(() => board.value[row][column]);  
 
     const [collect, drag] = useDrag(() => ({
@@ -64,20 +65,41 @@
     }, {flush: 'post'})
 
 
+    /* 
+        this is where i left off, i need to find a way to identify a piece that is captured by using
+        some sort of state that starts an animation when it's updated. This logic may need to be implemented
+        in the global store.
+    */
+
+
 </script>
 
 
 <template>
-    <div class='piece_container' :ref="drag">
-        <motion.img 
-            :key="pieceId"
-            v-if="!isDragging"      
-            v-show="pieceId !== ''"  
-            class="piece"                 
-            :layoutId="pieceId"
-            :src="isQueen ? images[`queen${pieceColor}`] : images[pieceColor]" 
-            @click="handlePiece" />
-    </div>
+    <AnimatePresence>
+        <div class='piece_container' :ref="drag">
+            <motion.img 
+                v-if="!isDragging && isQueen"
+                v-show="pieceId !== ''"      
+                class="piece"     
+                :key="`${pieceId} queen`"           
+                :layoutId="pieceId"
+                :src="images[`queen${pieceColor}`]" 
+                :initial="{scale: 1}"
+                :animate="controls"
+                @click="handlePiece" />   
+            <motion.img
+                v-else-if="!isDragging"  
+                v-show="pieceId !== ''"    
+                class="piece"     
+                :key="`${pieceId}`"           
+                :layoutId="pieceId"
+                :src="images[pieceColor]" 
+                :initial="{scale: 1}"
+                :animate="controls"
+                @click="handlePiece"/>         
+        </div>
+    </AnimatePresence>
 </template>
 
 
@@ -92,7 +114,8 @@
         inset: 0;
         margin: auto;
         border-radius: 100px;
-        transform: translate(0,0)
+        transform: translate(0,0);
+        transition: all 0s;
     }
 
     .piece{

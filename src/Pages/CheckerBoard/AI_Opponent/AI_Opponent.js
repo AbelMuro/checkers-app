@@ -10,17 +10,18 @@ import {storeToRefs} from 'pinia';
 
 function AI_Opponent() {
     const store = useBoardStore();
-    const {current_turn, board, player_color, history} = storeToRefs(store);
+    const {current_turn, board, player_color, history, piece_can_multi_take} = storeToRefs(store);
     const {AImovePiece} = store;
 
     const calculateMove = async () => {
+        const AI_color = player_color.value === 'red' ? 'black' : 'red';
         try{
             const response = await fetch('http://localhost:4000/ai_move', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({board: board.value})
+                body: JSON.stringify({board: board.value, color: AI_color})
             });
             if(response.status === 200){
                 const result = await response.json();
@@ -37,15 +38,16 @@ function AI_Opponent() {
         }
     }
 
-    watch([current_turn, board, history], ([current_turn,_ , {time_traveling}]) => {
+    watch([current_turn, board, history, piece_can_multi_take], ([current_turn,_ , {time_traveling}, piece_can_multi_take]) => {
         if(current_turn === player_color.value) return;
         if(time_traveling) return;
+        if(piece_can_multi_take) return;
         
         setTimeout(() => {
            calculateMove(); 
         }, 1000)
         
-    }, {flush: 'post'})
+    }, {flush: 'post', immediate: true})
 }
 
 export default AI_Opponent;

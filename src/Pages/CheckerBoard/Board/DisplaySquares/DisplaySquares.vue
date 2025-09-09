@@ -1,10 +1,14 @@
 <script setup>
     import {ref, onBeforeMount} from 'vue';
+    import useBoardStore from '~/Store';
+    import {storeToRefs} from 'pinia';
     import Square from './Square';
     import {DndProvider} from 'vue3-dnd';
     import {HTML5Backend} from 'react-dnd-html5-backend';
 
     const squares = ref([]);
+    const store = useBoardStore();
+    const {player_color} = storeToRefs(store);
 
     onBeforeMount(() => {
         let alternate = true;
@@ -17,10 +21,15 @@
                 else
                     isRed = column % 2 !== 0;    
 
-                if(isRed)
-                    squares.value.push(['red', column - 1, row - 1])
-                else
-                    squares.value.push(['black', column - 1, row - 1]);
+                if(isRed){
+                    player_color.value === 'red' && squares.value.push(['red', column - 1, row - 1]);
+                    player_color.value === 'black' && squares.value.push(['red', 7 - (column - 1), 7 - (row - 1)]);
+                }
+                    
+                else{
+                    player_color.value === 'red' && squares.value.push(['black', column - 1, row - 1]);
+                    player_color.value === 'black' && squares.value.push(['black', 7 - (column - 1), 7 - (row - 1)]);
+                }
             }
             alternate = !alternate;
         }   

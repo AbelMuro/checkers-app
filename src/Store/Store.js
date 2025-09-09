@@ -168,7 +168,7 @@ const useBoardStore = defineStore('board', {
                 this.board[toRow][toColumn] = newSquare.includes('promote') ? `${pieceId} queen` : pieceId;
                 this.legal_moves[toRow][toColumn] = '';
                 this.board[fromRow][fromColumn] = '';  
-                piecesTaken = capturePieces(newSquare, this.board, this.pieces_to_be_taken);                
+                piecesTaken = capturePieces(newSquare, this.board, this.pieces_to_be_taken);           //i may not need this method     
             }
 
             //we record the piece that moved

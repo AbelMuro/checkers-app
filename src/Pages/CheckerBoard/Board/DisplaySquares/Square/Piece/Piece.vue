@@ -3,7 +3,7 @@
     import {computed, watch} from 'vue';
     import {storeToRefs} from 'pinia';
     import images from './images';
-    import {motion, AnimatePresence, useAnimationControls} from 'motion-v';
+    import {motion, useAnimate} from 'motion-v';
     import {useDrag} from 'vue3-dnd';
 
     const {column, row} = defineProps({
@@ -12,9 +12,10 @@
     });    
     const store = useBoardStore();
     const {board, current_turn, player_color, piece_can_multi_take, pieces_must_take} = storeToRefs(store);
-    const {setPiece, createLegalSquares, createLegalSquaresForQueen} = store;
-    const controls = useAnimationControls();
+    const {setPiece, createLegalSquares, createLegalSquaresForQueen, capturePiece} = store;
+    const [scope, animate] = useAnimate();
     const pieceId = computed(() => board.value[row][column]);  
+    const captured = computed(() => board.value[row][column].includes('captured'));
 
     const [collect, drag] = useDrag(() => ({
         type: 'piece',
@@ -65,41 +66,36 @@
     }, {flush: 'post'})
 
 
-    /* 
-        this is where i left off, i need to find a way to identify a piece that is captured by using
-        some sort of state that starts an animation when it's updated. This logic may need to be implemented
-        in the global store.
-    */
+    watch(captured, (captured) => {
+        if(!captured) return;
 
+        animate(scope.value, {scale: 0}, {duration: 0.1});      //this is where i left off, this function is not creating an animation
+        capturePiece(row, column)                               // i finally found a way to identify an captured piece
+        
+    });
 
 </script>
 
 
 <template>
-    <AnimatePresence>
         <div class='piece_container' :ref="drag">
             <motion.img 
-                v-if="!isDragging && isQueen"
-                v-show="pieceId !== ''"      
+                ref="scope"
+                v-if="!isDragging && isQueen && pieceId !== ''"    
                 class="piece"     
-                :key="`${pieceId} queen`"           
+                :key="`${pieceId} queen`"        
                 :layoutId="pieceId"
                 :src="images[`queen${pieceColor}`]" 
-                :initial="{scale: 1}"
-                :animate="controls"
                 @click="handlePiece" />   
             <motion.img
-                v-else-if="!isDragging"  
-                v-show="pieceId !== ''"    
+                ref="scope"
+                v-else-if="!isDragging && pieceId !== ''"   
                 class="piece"     
-                :key="`${pieceId}`"           
+                :key="`${pieceId}`"     
                 :layoutId="pieceId"
                 :src="images[pieceColor]" 
-                :initial="{scale: 1}"
-                :animate="controls"
-                @click="handlePiece"/>         
+                @click="handlePiece"/>  
         </div>
-    </AnimatePresence>
 </template>
 
 

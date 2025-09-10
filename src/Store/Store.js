@@ -36,14 +36,6 @@ import {capturePieces} from './Functions/Capture';
 */ 
 
 
-
-/*
-
-    this is where i left off, i need to find a way to prevent the watcher from being called in the AI_Opponent.js 
-    when the setTimeout() updates the board state in the movePiece() method
-
-*/
-
 const useBoardStore = defineStore('board', {
     state: () => ({
             board: [
@@ -141,6 +133,7 @@ const useBoardStore = defineStore('board', {
                 let piece, moveToSquare, currentLegalSquare;
                 let jumps = newSquare[newSquare.length - 1];
                 let previousJump = null;
+
                     for(let i = 1; i <= Number(jumps); i++){         
                         piece = this.pieces_to_be_taken.shift();
                         if(!piece) break;
@@ -148,16 +141,16 @@ const useBoardStore = defineStore('board', {
                         currentLegalSquare = this.legal_moves[moveToSquare.row][moveToSquare.column];
                         if(i === 1){
                             this.piece_can_multi_take = true;
-                            this.board[piece.row][piece.column] = '';                       //capture the piece
-                            this.board[fromRow][fromColumn] = '';                           //we move the piece
-                            this.board[moveToSquare.row][moveToSquare.column] = pieceId;    //to this square     
+                            this.board[piece.row][piece.column] = `${piece.pieceId} captured`;  //capture the piece
+                            this.board[fromRow][fromColumn] = '';                            //we move the piece
+                            this.board[moveToSquare.row][moveToSquare.column] = pieceId;     //to this square     
                             previousJump = {row: moveToSquare.row, column: moveToSquare.column}                       
                         }
                         else
                             setTimeout(() => {
                                 if(previousJump)
                                     this.board[previousJump.row][previousJump.column] = '';
-                                this.board[piece.row][piece.column] = '';                       //capture the piece
+                                this.board[piece.row][piece.column] = `${piece.pieceId} captured`; //capture the piece
                                 this.board[moveToSquare.row][moveToSquare.column] = pieceId;    //to this square
                                 previousJump = {row: moveToSquare.row, column: moveToSquare.column};
                             }, 400)
@@ -338,6 +331,9 @@ const useBoardStore = defineStore('board', {
                 diagonalTakes(pieceId, this.board, this.legal_moves, this.pieces_to_be_taken, this.current_turn, column, row);
 
         },
+        capturePiece(row, column) {
+            this.board[row][column] = ''
+        },
         changeTurn() {
             this.current_turn = this.current_turn === 'red' ? 'black' : 'red';
         },
@@ -362,7 +358,7 @@ const useBoardStore = defineStore('board', {
         },
         resetPiecesMustTake() {
             this.pieces_must_take = [];
-        }
+        },
     }
 })
 

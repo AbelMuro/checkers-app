@@ -69,10 +69,18 @@
     watch(captured, (captured) => {
         if(!captured) return;
 
-        animate(scope.value, {scale: 0}, {duration: 0.1});      //this is where i left off, this function is not creating an animation
-        capturePiece(row, column)                               // i finally found a way to identify an captured piece
+        const result = animate(scope.value, {opacity: 0}, {duration: 0.2});      //this is where i left off, this function is not creating an animation
+        result.then(() => {
+            console.log('animation complete');
+            capturePiece(row, column)                                        // i finally found a way to identify an captured piece            
+        })
+        .catch(() => {;
+            console.log('animation error')
+        })        
+
+
         
-    });
+    }, {flush: 'post'});
 
 </script>
 
@@ -117,6 +125,7 @@
     .piece{
         width: 100%;
         height: 100%;
+        display: inline-block;
         cursor: pointer;
         transition: none;
     }

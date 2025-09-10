@@ -69,18 +69,22 @@
     watch(captured, (captured) => {
         if(!captured) return;
 
-        const result = animate(scope.value, {opacity: 0}, {duration: 0.2});      //this is where i left off, this function is not creating an animation
+        const result = animate(scope.value, {opacity: 0}, {duration: 0.2});      
         result.then(() => {
             console.log('animation complete');
-            capturePiece(row, column)                                        // i finally found a way to identify an captured piece            
+            capturePiece(row, column)                                                 
         })
         .catch(() => {;
             console.log('animation error')
         })        
-
-
         
     }, {flush: 'post'});
+
+
+    /* 
+        this is where i left off, i want to update my notes on framer-motion,
+        i may need to create two separate sections, one for vue and one for react
+    */
 
 </script>
 

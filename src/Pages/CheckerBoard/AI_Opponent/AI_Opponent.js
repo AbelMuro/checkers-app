@@ -25,6 +25,7 @@ function AI_Opponent() {
             });
             if(response.status === 200){
                 const result = await response.json();
+                console.log(result);
                 AImovePiece(result);
             }
             else if(response.status === 501){

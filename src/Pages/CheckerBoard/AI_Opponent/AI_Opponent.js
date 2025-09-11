@@ -16,7 +16,7 @@ function AI_Opponent() {
     const calculateMove = async () => {
         const AI_color = player_color.value === 'red' ? 'black' : 'red';
         try{
-            const response = await fetch('http://localhost:4000/ai_move', {
+            const response = await fetch('https://world-class-checkers-server.netlify.app//ai_move', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

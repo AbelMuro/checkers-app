@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia';
-import {diagonalMoves, diagonalQueenMoves, diagonalTakes, traverseBoard, diagonalQueenTakes} from './Functions/Traversal';
+import {diagonalMoves, diagonalQueenMoves, diagonalTakes, traverseBoard, diagonalQueenTakes, checkDiagonalTakes, checkQueenDiagonalTakes} from './Functions/Traversal';
 import {capturePieces} from './Functions/Capture';
 
 
@@ -34,6 +34,11 @@ import {capturePieces} from './Functions/Capture';
         The watcher in CheckerBoard.vue will NOT be called if the user clicks on the 'redo' and 'undo' buttons.
         If it was called, then it will cause unexpected bugs. So i had to implement a separate logic for these buttons.
 */ 
+
+
+/* 
+    this is where i left off, i need to test out if the AI can capture multiple pieces on the board
+*/
 
 
 const useBoardStore = defineStore('board', {
@@ -207,6 +212,7 @@ const useBoardStore = defineStore('board', {
             const to = move.to;
             let pieceId = move.piece;
             const capture = move.capture;
+            const AiColor = this.player_color === 'red' ? 'black' : 'red';
             const opposingColor = this.player_color;
 
             this.board[from.row][from.col] = '';
@@ -232,6 +238,9 @@ const useBoardStore = defineStore('board', {
             while(this.history.future.length)
                 this.history.future.pop();
 
+            if(pieceId.includes('queen') && checkQueenDiagonalTakes(this.board, AiColor, to.column, to.row)) return;
+            if(checkDiagonalTakes(this.board, AiColor, to.column, to.row)) return;
+                
             this.changeTurn();
         },  
         undoMove(){

@@ -71,7 +71,6 @@
 
         const result = animate(scope.value, {opacity: 0}, {duration: 0.2});      
         result.then(() => {
-            console.log('animation complete');
             capturePiece(row, column)                                                 
         })
         .catch(() => {;

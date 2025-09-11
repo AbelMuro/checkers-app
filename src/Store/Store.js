@@ -202,7 +202,6 @@ const useBoardStore = defineStore('board', {
             }
         },
         AImovePiece(move){
-            console.log(move);
             let firstPromotion = false;
             const from = move.from;
             const to = move.to;
@@ -239,7 +238,6 @@ const useBoardStore = defineStore('board', {
             const move = this.history.past.pop();
             if(!move) return;
 
-            console.log('undoMove', move);
             this.history.future.push(move);
             this.history.time_traveling = true;
 

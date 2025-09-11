@@ -48,7 +48,7 @@ function AI_Opponent() {
            calculateMove(); 
         }, 1000)
         
-    }, {flush: 'post', immediate: true})
+    }, {flush: 'post', immediate: true, deep: 2})
 }
 
 export default AI_Opponent;

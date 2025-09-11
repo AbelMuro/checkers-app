@@ -10,7 +10,7 @@ import {storeToRefs} from 'pinia';
 
 function AI_Opponent() {
     const store = useBoardStore();
-    const {current_turn, board, player_color, history, piece_can_multi_take} = storeToRefs(store);
+    const {current_turn, board, player_color, history, piece_can_multi_take, difficulty} = storeToRefs(store);
     const {AImovePiece} = store;
 
     const calculateMove = async () => {
@@ -21,7 +21,7 @@ function AI_Opponent() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({board: board.value, color: AI_color})
+                body: JSON.stringify({board: board.value, color: AI_color, difficulty})
             });
             if(response.status === 200){
                 const result = await response.json();

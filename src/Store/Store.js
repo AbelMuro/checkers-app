@@ -238,8 +238,8 @@ const useBoardStore = defineStore('board', {
             while(this.history.future.length)
                 this.history.future.pop();
 
-            if(pieceId.includes('queen') && checkQueenDiagonalTakes(this.board, AiColor, to.col, to.row)) return;
-            if(checkDiagonalTakes(this.board, AiColor, to.col, to.row)) return;
+            if(capture && pieceId.includes('queen') && checkQueenDiagonalTakes(this.board, AiColor, to.col, to.row)) return;
+            if(capture && checkDiagonalTakes(this.board, AiColor, to.col, to.row)) return;
                 
             this.changeTurn();
         },  

@@ -215,14 +215,16 @@ const useBoardStore = defineStore('board', {
             const AiColor = this.player_color === 'red' ? 'black' : 'red';
             const opposingColor = this.player_color;
 
-            this.board[from.row][from.col] = '';
-            this.board[to.row][to.col] = pieceId;
             if(capture)
                 this.board[capture.row][capture.col] = '';
             if((to.row === 0 || to.row === 7) && !pieceId.includes('queen')){
                 firstPromotion = true;
                 pieceId = `${pieceId} queen`;
+
             }
+
+            this.board[from.row][from.col] = '';
+            this.board[to.row][to.col] = pieceId;
                 
             //we record the piece that moved
             this.history.past.push({

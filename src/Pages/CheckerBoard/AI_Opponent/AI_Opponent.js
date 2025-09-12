@@ -24,7 +24,6 @@ function AI_Opponent() {
                 body: JSON.stringify({board: board.value, color: AI_color, difficulty: difficulty.value})
             });
             if(response.status === 200){
-                console.log(result);
                 const result = await response.json();
                 AImovePiece(result);
             }

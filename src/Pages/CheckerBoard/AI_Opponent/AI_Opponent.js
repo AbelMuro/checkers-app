@@ -21,7 +21,7 @@ function AI_Opponent() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({board: board.value, color: AI_color, difficulty})
+                body: JSON.stringify({board: board.value, color: AI_color, difficulty: difficulty.value})
             });
             if(response.status === 200){
                 console.log(result);

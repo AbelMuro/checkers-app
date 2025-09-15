@@ -37,7 +37,15 @@ import {capturePieces} from './Functions/Capture';
 
 
 /* 
-   [
+    this is where i left off, i need to fix the bugs for the redo and undo button features of checkers
+    
+
+*/
+
+
+const useBoardStore = defineStore('board', {
+    state: () => ({
+            board:  [
                 ['black 9', '', 'black 10', '', 'black 11', '', 'black 12', ''],
                 ['', 'black 5', '', 'black 6', '', 'black 7', '', 'black 8'],
                 ['black 1', '', 'black 2', '', 'black 3', '', 'black 4', '',],
@@ -46,20 +54,6 @@ import {capturePieces} from './Functions/Capture';
                 ['', 'red 1', '', 'red 2', '', 'red 3', '', 'red 4',],
                 ['red 5', '', 'red 6', '', 'red 7', '', 'red 8', ''],
                 ['', 'red 9', '', 'red 10', '', 'red 11', '', 'red 12'],
-            ]
-*/
-
-const useBoardStore = defineStore('board', {
-    state: () => ({
-            board: [
-                ['', '', '', '', '', '', 'black 12', ''],
-                ['', '', '', '', '', '', '', '' ],
-                ['', '', '', '', 'black 11', '', '', '' ],
-                ['', '', '', '', '', '', '', '' ],
-                ['', '', 'black 12', '', '', '', '', '' ],
-                ['', 'red 10', '', '', '', '', '', '' ],
-                ['', '', '', '', '', '', '', '' ],
-                ['', '', '', '', '', 'red 13', '', '' ],
             ],
             legal_moves: [
                 ['', '', '', '', '', '' ,'', ''],
@@ -228,7 +222,6 @@ const useBoardStore = defineStore('board', {
             if((to.row === 0 || to.row === 7) && !pieceId.includes('queen')){
                 firstPromotion = true;
                 pieceId = `${pieceId} queen`;
-
             }
 
             this.board[from.row][from.col] = '';

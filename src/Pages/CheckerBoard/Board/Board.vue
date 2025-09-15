@@ -12,8 +12,7 @@
         return history.value.time_traveling;
     });
 
-    watch([current_turn, time_traveling], ([current_turn, time_traveling]) => {
-        if(time_traveling) return;
+    watch([current_turn], ([current_turn]) => {
         if(player_color.value !== current_turn) return;
 
         checkForPossibleTakes();

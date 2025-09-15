@@ -39,7 +39,6 @@ function AI_Opponent() {
     }
 
     watch([current_turn, board, history, piece_can_multi_take], ([current_turn,_ , {time_traveling}, piece_can_multi_take]) => {
-        console.log(current_turn, time_traveling, piece_can_multi_take);
         if(current_turn === player_color.value) return;
         if(time_traveling) return;
         if(piece_can_multi_take) return;

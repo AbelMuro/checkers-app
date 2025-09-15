@@ -40,18 +40,28 @@ import {capturePieces} from './Functions/Capture';
     this is where i left off, i need to test out if the AI can capture multiple pieces on the board
 */
 
+[
+    ['', '', '', '', '', '', 'black 12', ''],
+    ['', '', '', '', '', '', '', '' ],
+    ['', '', '', '', '', 'black 11', '', '' ],
+    ['', '', '', '', '', '', '', '' ],
+    ['', '', '', '', 'black 13', '', '', '' ],
+    ['', '', '', 'red 1', '', '', '', '' ],
+    ['', '', '', '', '', '', '', '' ],
+    ['', '', '', '', '', '', '', '' ],
+]
 
 const useBoardStore = defineStore('board', {
     state: () => ({
             board: [
-                ['black 9', '', 'black 10', '', 'black 11', '', 'black 12', ''],
-                ['', 'black 5', '', 'black 6', '', 'black 7', '', 'black 8'],
-                ['black 1', '', 'black 2', '', 'black 3', '', 'black 4', '',],
-                ['', '', '', '', '', '', '', '',],
-                ['', '', '', '', '', '', '', '',],
-                ['', 'red 1', '', 'red 2', '', 'red 3', '', 'red 4',],
-                ['red 5', '', 'red 6', '', 'red 7', '', 'red 8', ''],
-                ['', 'red 9', '', 'red 10', '', 'red 11', '', 'red 12'],
+                ['', '', '', '', '', '', 'black 12', ''],
+                ['', '', '', '', '', '', '', '' ],
+                ['', '', '', '', '', 'black 11', '', '' ],
+                ['', '', '', '', '', '', '', '' ],
+                ['', '', '', '', 'black 13', '', '', '' ],
+                ['', '', '', 'red 1', '', '', '', '' ],
+                ['', '', '', '', '', '', '', '' ],
+                ['', '', '', '', '', '', '', '' ],
             ],
             legal_moves: [
                 ['', '', '', '', '', '' ,'', ''],
@@ -156,7 +166,7 @@ const useBoardStore = defineStore('board', {
                                 if(previousJump)
                                     this.board[previousJump.row][previousJump.column] = '';
                                 this.board[piece.row][piece.column] = `${piece.pieceId} captured`; //capture the piece
-                                this.board[moveToSquare.row][moveToSquare.column] = pieceId;    //to this square
+                                this.board[moveToSquare.row][moveToSquare.column] = pieceId; 
                                 previousJump = {row: moveToSquare.row, column: moveToSquare.column};
                             }, 400)
                         piecesTaken.push(piece);

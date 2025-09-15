@@ -13,15 +13,15 @@ function AI_Opponent() {
     const {current_turn, board, player_color, history, piece_can_multi_take, difficulty} = storeToRefs(store);
     const {AImovePiece} = store;
 
-    const calculateMove = async () => {
+    const calculateMove = async (board) => {
         const AI_color = player_color.value === 'red' ? 'black' : 'red';
         try{
-            const response = await fetch('https://world-class-checkers-server.netlify.app/ai_move', {
+            const response = await fetch('http://localhost:4000/ai_move', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({board: board.value, color: AI_color, difficulty: difficulty.value})
+                body: JSON.stringify({board: board, color: AI_color, difficulty: difficulty.value})
             });
             if(response.status === 200){
                 const result = await response.json();
@@ -38,13 +38,15 @@ function AI_Opponent() {
         }
     }
 
-    watch([current_turn, board, history, piece_can_multi_take], ([current_turn,_ , {time_traveling}, piece_can_multi_take]) => {
+    watch([current_turn, board, history, piece_can_multi_take], ([current_turn, board, {time_traveling}, piece_can_multi_take]) => {
         if(current_turn === player_color.value) return;
         if(time_traveling) return;
         if(piece_can_multi_take) return;
+
+        console.log('watcher called')
         
         setTimeout(() => {
-           calculateMove(); 
+           calculateMove(board); 
         }, 1000)
         
     }, {flush: 'post', immediate: true, deep: true})

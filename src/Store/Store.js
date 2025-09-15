@@ -182,7 +182,7 @@ const useBoardStore = defineStore('board', {
             this.history.past.push({
                 from: {pieceId: '', column: fromColumn, row: fromRow},
                 to: {pieceId, column: toColumn, row: toRow},
-                piecesTaken,
+                piecesTaken: JSON.parse(JSON.stringify(piecesTaken)),
                 promotion: newSquare.includes('promote'),
             });
 
@@ -271,7 +271,7 @@ const useBoardStore = defineStore('board', {
             });                
 
             this.resetPiecesMustTake();
-
+            this.resetLegalMoves();
             this.current_turn = pieceId.includes('red') ? 'red' : 'black';            
         },
         redoMove() {
